@@ -8,6 +8,8 @@ import org.springframework.http.ProblemDetail;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import com.csirt.notifiche.service.OperazioneNonConsentitaException;
+import com.csirt.notifiche.service.RichiestaNonValidaException;
 
 import com.csirt.notifiche.service.IncidenteNonTrovatoException;
 
@@ -27,5 +29,14 @@ public class GestoreErrori {
                 .forEach(campo -> errori.put(campo.getField(), campo.getDefaultMessage()));
         problema.setProperty("errori", errori);
         return problema;
+    }
+        @ExceptionHandler(RichiestaNonValidaException.class)
+    public ProblemDetail richiestaNonValida(RichiestaNonValidaException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
+
+    @ExceptionHandler(OperazioneNonConsentitaException.class)
+    public ProblemDetail operazioneNonConsentita(OperazioneNonConsentitaException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
     }
 }

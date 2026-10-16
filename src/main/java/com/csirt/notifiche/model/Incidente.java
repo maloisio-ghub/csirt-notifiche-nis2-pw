@@ -55,13 +55,23 @@ public class Incidente {
         this.stato = StatoIncidente.REGISTRATO;
     }
 
-    /** L'incidente diventa significativo: da questo momento partono le scadenze. */
+    /** Esito positivo: da questo momento decorrono i termini di notifica. */
     public void dichiaraSignificativo(Instant momento) {
-        if (stato != StatoIncidente.REGISTRATO) {
-            throw new IllegalStateException("Incidente già valutato: stato " + stato);
-        }
+        verificaValutabile();
         this.stato = StatoIncidente.SIGNIFICATIVO;
         this.dataConoscenza = momento;
+    }
+
+    /** Esito negativo: l'incidente potrà essere rivalutato se emergono nuove informazioni. */
+    public void dichiaraNonSignificativo() {
+        verificaValutabile();
+        this.stato = StatoIncidente.NON_SIGNIFICATIVO;
+    }
+
+    private void verificaValutabile() {
+        if (stato != StatoIncidente.REGISTRATO && stato != StatoIncidente.NON_SIGNIFICATIVO) {
+            throw new IllegalStateException("L'incidente è " + stato + ": non può essere rivalutato");
+        }
     }
 
     public Long getId() { return id; }
