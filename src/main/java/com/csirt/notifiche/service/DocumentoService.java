@@ -2,17 +2,20 @@ package com.csirt.notifiche.service;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.csirt.notifiche.documenti.RegoleDocumento;
 import com.csirt.notifiche.dto.ContenutoDto;
 import com.csirt.notifiche.dto.DocumentoDto;
 import com.csirt.notifiche.model.ContenutoNotifica;
 import com.csirt.notifiche.model.Documento;
 import com.csirt.notifiche.model.Incidente;
+import com.csirt.notifiche.model.StatoDocumento;
 import com.csirt.notifiche.model.StatoIncidente;
 import com.csirt.notifiche.model.TipoDocumento;
 import com.csirt.notifiche.repository.DocumentoRepository;
@@ -36,7 +39,7 @@ public class DocumentoService {
         Incidente incidente = incidenteService.trova(incidenteId);
         if (incidente.getStato() != StatoIncidente.SIGNIFICATIVO) {
             throw new OperazioneNonConsentitaException("L'incidente è " + incidente.getStato()
-                    + ": non ci sono obblighi di notifica");
+                    + ": non si possono creare documenti");
         }
 
         Optional<Documento> ultimoDelTipo = documenti.findTopByIncidenteIdAndTipoOrderByVersioneDesc(incidenteId, tipo);
@@ -66,6 +69,35 @@ public class DocumentoService {
         return DocumentoDto.da(documento);
     }
 
+    /** Trasmissione al CSIRT (simulata): ordine, completezza, impronta, chiusura del fascicolo. */
+    @Transactional
+    public DocumentoDto trasmetti(Long documentoId) {
+        Documento documento = trova(documentoId);
+        Incidente incidente = documento.getIncidente();
+        if (!documento.isBozza()) {
+            throw new OperazioneNonConsentitaException(documento.getTipo().getEtichetta() + " v"
+                    + documento.getVersione() + " è già stata trasmessa");
+        }
+        if (incidente.getStato() == StatoIncidente.CHIUSO) {
+            throw new OperazioneNonConsentitaException("L'incidente è chiuso: nessun ulteriore invio");
+        }
+        verificaOrdine(documento);
+
+        List<String> mancanti = RegoleDocumento.campiMancanti(documento.getContenuto(), documento.getTipo());
+        if (!mancanti.isEmpty()) {
+            throw new DocumentoIncompletoException(documento.getTipo(), mancanti);
+        }
+
+        // Il database conserva i microsecondi: si tronca qui perché l'impronta resti verificabile dopo la rilettura.
+        Instant adesso = Instant.now(clock).truncatedTo(ChronoUnit.MICROS);
+        documento.trasmetti(adesso, RegoleDocumento.sha256(RegoleDocumento.testoCanonico(documento, adesso)));
+
+        if (documento.getTipo() == TipoDocumento.RELAZIONE_FINALE) {
+            incidente.chiudi();
+        }
+        return DocumentoDto.da(documento);
+    }
+
     @Transactional(readOnly = true)
     public DocumentoDto dettaglio(Long documentoId) {
         return DocumentoDto.da(trova(documentoId));
@@ -75,6 +107,20 @@ public class DocumentoService {
     public List<DocumentoDto> elenco(Long incidenteId) {
         incidenteService.trova(incidenteId);
         return documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream().map(DocumentoDto::da).toList();
+    }
+
+    /** La notifica richiede la pre-notifica trasmessa; la relazione finale richiede la notifica trasmessa. */
+    private void verificaOrdine(Documento documento) {
+        TipoDocumento precedente = switch (documento.getTipo()) {
+            case PRE_NOTIFICA -> null;
+            case NOTIFICA -> TipoDocumento.PRE_NOTIFICA;
+            case RELAZIONE_FINALE -> TipoDocumento.NOTIFICA;
+        };
+        if (precedente != null && !documenti.existsByIncidenteIdAndTipoAndStato(
+                documento.getIncidente().getId(), precedente, StatoDocumento.TRASMESSO)) {
+            throw new OperazioneNonConsentitaException("Prima di trasmettere " + documento.getTipo().getEtichetta()
+                    + " va trasmessa: " + precedente.getEtichetta());
+        }
     }
 
     private Documento trova(Long documentoId) {

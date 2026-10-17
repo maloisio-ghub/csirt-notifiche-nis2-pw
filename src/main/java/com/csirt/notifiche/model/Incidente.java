@@ -74,6 +74,14 @@ public class Incidente {
         }
     }
 
+    /** Trasmessa la relazione finale, il fascicolo si chiude. */
+    public void chiudi() {
+        if (stato != StatoIncidente.SIGNIFICATIVO) {
+            throw new IllegalStateException("Solo un incidente significativo può essere chiuso (stato " + stato + ")");
+        }
+        this.stato = StatoIncidente.CHIUSO;
+    }
+
     public Long getId() { return id; }
     public String getTitolo() { return titolo; }
     public String getDescrizione() { return descrizione; }

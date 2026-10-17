@@ -12,6 +12,8 @@ import com.csirt.notifiche.service.OperazioneNonConsentitaException;
 import com.csirt.notifiche.service.RichiestaNonValidaException;
 import com.csirt.notifiche.service.DocumentoNonTrovatoException;
 import com.csirt.notifiche.service.IncidenteNonTrovatoException;
+import org.springframework.http.HttpStatusCode;
+import com.csirt.notifiche.service.DocumentoIncompletoException;
 
 @RestControllerAdvice
 public class GestoreErrori {
@@ -43,5 +45,13 @@ public class GestoreErrori {
     @ExceptionHandler(DocumentoNonTrovatoException.class)
     public ProblemDetail documentoNonTrovato(DocumentoNonTrovatoException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
+    }
+
+    @ExceptionHandler(DocumentoIncompletoException.class)
+    public ProblemDetail documentoIncompleto(DocumentoIncompletoException e) {
+        ProblemDetail problema = ProblemDetail.forStatusAndDetail(HttpStatusCode.valueOf(422), e.getMessage());
+        problema.setTitle("Documento incompleto");
+        problema.setProperty("campiMancanti", e.getCampiMancanti());
+        return problema;
     }
 }

@@ -16,6 +16,7 @@ import com.csirt.notifiche.dto.ContenutoDto;
 import com.csirt.notifiche.dto.DocumentoDto;
 import com.csirt.notifiche.dto.NuovoDocumento;
 import com.csirt.notifiche.service.DocumentoService;
+import com.csirt.notifiche.documenti.RegoleDocumento;
 
 import jakarta.validation.Valid;
 
@@ -48,5 +49,20 @@ public class DocumentoController {
     @PutMapping("/documenti/{id}")
     public DocumentoDto aggiorna(@PathVariable Long id, @Valid @RequestBody ContenutoDto contenuto) {
         return service.aggiorna(id, contenuto);
+    }
+
+    @PostMapping("/documenti/{id}/trasmissione")
+    public DocumentoDto trasmetti(@PathVariable Long id) {
+        return service.trasmetti(id);
+    }
+
+    @GetMapping("/documenti/matrice")
+    public List<RegoleDocumento.Campo> matrice() {
+        return RegoleDocumento.matrice();
+    }
+
+    @GetMapping(value = "/documenti/matrice.md", produces = "text/markdown;charset=UTF-8")
+    public String matriceMarkdown() {
+        return RegoleDocumento.matriceMarkdown();
     }
 }

@@ -13,12 +13,18 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PostLoad;
+import jakarta.persistence.PostPersist;
+import jakarta.persistence.PostUpdate;
+import jakarta.persistence.PreRemove;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 /**
- * Un adempimento verso il CSIRT. Ogni tipo può avere più versioni (1, 2, ...):
- * una versione trasmessa non si modifica, un aggiornamento è una versione nuova.
+ * Un adempimento verso il CSIRT. Ogni tipo può avere più versioni: una versione
+ * trasmessa non si modifica, un aggiornamento è una versione nuova.
  */
 @Entity
 @Table(name = "documento", uniqueConstraints = @UniqueConstraint(
@@ -56,6 +62,14 @@ public class Documento {
     @Column(name = "data_trasmissione")
     private Instant dataTrasmissione;
 
+    /** Impronta SHA-256 del testo canonico, calcolata alla trasmissione. */
+    @Column(name = "hash_sha256", length = 64)
+    private String hashSha256;
+
+    /** Vero se nel database il documento risulta già trasmesso. Non è una colonna. */
+    @Transient
+    private boolean trasmessoNelDatabase;
+
     protected Documento() {
         // richiesto da JPA
     }
@@ -71,21 +85,54 @@ public class Documento {
         this.dataUltimaModifica = adesso;
     }
 
-    /** Salvataggio in bozza: consentito solo finché il documento non è trasmesso. */
+    /** Salvataggio in bozza. */
     public void aggiornaContenuto(ContenutoNotifica nuovo, Instant adesso) {
-        if (stato != StatoDocumento.BOZZA) {
-            throw new IllegalStateException(tipo.getEtichetta() + " v" + versione + " è " + stato
-                    + ": non è più modificabile");
-        }
+        verificaBozza();
         this.contenuto = nuovo.copia();
         this.dataUltimaModifica = adesso;
+    }
+
+    /** Trasmissione: da qui in poi il documento è immutabile. */
+    public void trasmetti(Instant momento, String impronta) {
+        verificaBozza();
+        this.stato = StatoDocumento.TRASMESSO;
+        this.dataTrasmissione = momento;
+        this.hashSha256 = impronta;
+    }
+
+    private void verificaBozza() {
+        if (stato != StatoDocumento.BOZZA) {
+            throw new IllegalStateException(tipo.getEtichetta() + " v" + versione
+                    + " è già stata trasmessa: non è modificabile");
+        }
+    }
+
+    // Seconda linea di difesa: anche se qualcuno aggirasse i metodi sopra,
+    // Hibernate rifiuta di aggiornare o cancellare una riga già trasmessa.
+
+    @PostLoad
+    @PostPersist
+    @PostUpdate
+    void sincronizzaStatoDatabase() {
+        trasmessoNelDatabase = stato == StatoDocumento.TRASMESSO;
+    }
+
+    @PreUpdate
+    @PreRemove
+    void impedisciModificaTrasmesso() {
+        if (trasmessoNelDatabase) {
+            throw new IllegalStateException("Il documento " + id + " è trasmesso: non può essere modificato né cancellato");
+        }
     }
 
     public boolean isBozza() {
         return stato == StatoDocumento.BOZZA;
     }
 
-    /** Hibernate restituisce null se tutte le colonne del contenuto sono vuote. */
+    public boolean isTrasmesso() {
+        return stato == StatoDocumento.TRASMESSO;
+    }
+
     public ContenutoNotifica getContenuto() {
         return contenuto == null ? new ContenutoNotifica() : contenuto;
     }
@@ -98,4 +145,5 @@ public class Documento {
     public Instant getDataCreazione() { return dataCreazione; }
     public Instant getDataUltimaModifica() { return dataUltimaModifica; }
     public Instant getDataTrasmissione() { return dataTrasmissione; }
+    public String getHashSha256() { return hashSha256; }
 }

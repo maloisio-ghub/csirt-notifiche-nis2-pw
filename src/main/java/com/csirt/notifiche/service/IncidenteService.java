@@ -2,7 +2,9 @@ package com.csirt.notifiche.service;
 
 import java.time.Clock;
 import java.time.Instant;
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -10,6 +12,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.csirt.notifiche.dto.NuovoIncidente;
 import com.csirt.notifiche.model.Incidente;
+import com.csirt.notifiche.model.StatoDocumento;
+import com.csirt.notifiche.model.TipoDocumento;
+import com.csirt.notifiche.repository.DocumentoRepository;
 import com.csirt.notifiche.repository.IncidenteRepository;
 import com.csirt.notifiche.scadenze.CalcolatoreScadenze;
 import com.csirt.notifiche.scadenze.Scadenza;
@@ -18,11 +23,13 @@ import com.csirt.notifiche.scadenze.Scadenza;
 public class IncidenteService {
 
     private final IncidenteRepository repository;
+    private final DocumentoRepository documenti;
     private final Clock clock;
     private final CalcolatoreScadenze calcolatore = new CalcolatoreScadenze();
 
-    public IncidenteService(IncidenteRepository repository, Clock clock) {
+    public IncidenteService(IncidenteRepository repository, DocumentoRepository documenti, Clock clock) {
         this.repository = repository;
+        this.documenti = documenti;
         this.clock = clock;
     }
 
@@ -43,10 +50,15 @@ public class IncidenteService {
         return repository.findAll(Sort.by(Sort.Direction.DESC, "dataRegistrazione"));
     }
 
-        @Transactional(readOnly = true)
+    /** Termini dell'incidente, con l'esito per i documenti già trasmessi (prima versione di ogni tipo). */
+    @Transactional(readOnly = true)
     public List<Scadenza> scadenze(Long id) {
         Incidente incidente = trova(id);
-        // La data di trasmissione della notifica sarà disponibile dal Passo 8, con i documenti.
-        return calcolatore.calcola(incidente.getDataConoscenza(), null, Instant.now(clock));
+        Map<TipoDocumento, Instant> trasmissioni = new EnumMap<>(TipoDocumento.class);
+        for (TipoDocumento tipo : TipoDocumento.values()) {
+            documenti.findFirstByIncidenteIdAndTipoAndStatoOrderByVersioneAsc(id, tipo, StatoDocumento.TRASMESSO)
+                    .ifPresent(d -> trasmissioni.put(tipo, d.getDataTrasmissione()));
+        }
+        return calcolatore.calcolaConTrasmissioni(incidente.getDataConoscenza(), trasmissioni, Instant.now(clock));
     }
 }
