@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import com.csirt.notifiche.service.OperazioneNonConsentitaException;
 import com.csirt.notifiche.service.RichiestaNonValidaException;
-
+import com.csirt.notifiche.service.DocumentoNonTrovatoException;
 import com.csirt.notifiche.service.IncidenteNonTrovatoException;
 
 @RestControllerAdvice
@@ -38,5 +38,10 @@ public class GestoreErrori {
     @ExceptionHandler(OperazioneNonConsentitaException.class)
     public ProblemDetail operazioneNonConsentita(OperazioneNonConsentitaException e) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, e.getMessage());
+    }
+
+    @ExceptionHandler(DocumentoNonTrovatoException.class)
+    public ProblemDetail documentoNonTrovato(DocumentoNonTrovatoException e) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
     }
 }
