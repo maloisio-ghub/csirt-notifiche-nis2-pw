@@ -16,6 +16,7 @@ import com.csirt.notifiche.dto.IncidenteDto;
 import com.csirt.notifiche.dto.NuovoIncidente;
 import com.csirt.notifiche.model.Incidente;
 import com.csirt.notifiche.service.IncidenteService;
+import com.csirt.notifiche.scadenze.Scadenza;
 
 import jakarta.validation.Valid;
 
@@ -45,5 +46,10 @@ public class IncidenteController {
     @GetMapping("/{id}")
     public IncidenteDto dettaglio(@PathVariable Long id) {
         return IncidenteDto.da(service.trova(id));
+    }
+
+    @GetMapping("/{id}/scadenze")
+    public List<Scadenza> scadenze(@PathVariable Long id) {
+        return service.scadenze(id);
     }
 }

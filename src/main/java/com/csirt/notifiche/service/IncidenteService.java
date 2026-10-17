@@ -11,12 +11,15 @@ import org.springframework.transaction.annotation.Transactional;
 import com.csirt.notifiche.dto.NuovoIncidente;
 import com.csirt.notifiche.model.Incidente;
 import com.csirt.notifiche.repository.IncidenteRepository;
+import com.csirt.notifiche.scadenze.CalcolatoreScadenze;
+import com.csirt.notifiche.scadenze.Scadenza;
 
 @Service
 public class IncidenteService {
 
     private final IncidenteRepository repository;
     private final Clock clock;
+    private final CalcolatoreScadenze calcolatore = new CalcolatoreScadenze();
 
     public IncidenteService(IncidenteRepository repository, Clock clock) {
         this.repository = repository;
@@ -38,5 +41,12 @@ public class IncidenteService {
     @Transactional(readOnly = true)
     public List<Incidente> elenco() {
         return repository.findAll(Sort.by(Sort.Direction.DESC, "dataRegistrazione"));
+    }
+
+        @Transactional(readOnly = true)
+    public List<Scadenza> scadenze(Long id) {
+        Incidente incidente = trova(id);
+        // La data di trasmissione della notifica sarà disponibile dal Passo 8, con i documenti.
+        return calcolatore.calcola(incidente.getDataConoscenza(), null, Instant.now(clock));
     }
 }
