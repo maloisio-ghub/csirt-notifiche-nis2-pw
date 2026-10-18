@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Notifiche NIS2 – CSIRT Italia</title>
+    <link rel="stylesheet" href="app.css">
+</head>
+<body>
+<header class="testata">
+    <div>
+        <h1>Notifiche di incidente significativo</h1>
+        <p>Alfa Managed Services S.r.l. · adempimenti verso il CSIRT Italia (D.Lgs. 138/2024 – Dir. UE 2022/2555)</p>
+    </div>
+    <span id="versione-tassonomia" class="etichetta-tassonomia"></span>
+</header>
+
+<main class="impaginazione">
+    <aside class="colonna-elenco">
+        <section class="pannello">
+            <h2>Nuovo incidente</h2>
+            <form id="form-incidente" class="modulo">
+                <label>Titolo
+                    <input name="titolo" required maxlength="200" placeholder="Es. Console SD-WAN irraggiungibile">
+                </label>
+                <label>Descrizione
+                    <textarea name="descrizione" rows="3" maxlength="4000"></textarea>
+                </label>
+                <label>Rilevato il
+                    <input name="dataRilevamento" type="datetime-local" required>
+                </label>
+                <button type="submit">Registra incidente</button>
+            </form>
+            <div id="messaggio-incidente"></div>
+        </section>
+
+        <section class="pannello">
+            <h2>Incidenti</h2>
+            <ul id="elenco-incidenti" class="elenco"></ul>
+        </section>
+    </aside>
+
+    <section id="dettaglio" class="colonna-dettaglio">
+        <div class="pannello vuoto">Registra un incidente o selezionane uno dall'elenco.</div>
+    </section>
+</main>
+
+<script src="app.js"></script>
+</body>
+</html>
