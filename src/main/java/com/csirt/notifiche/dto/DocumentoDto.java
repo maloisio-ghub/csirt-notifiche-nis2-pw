@@ -2,6 +2,7 @@ package com.csirt.notifiche.dto;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Locale;
 
 import com.csirt.notifiche.documenti.RegoleDocumento;
 import com.csirt.notifiche.documenti.Riclassificazioni.Riclassificazione;
@@ -41,5 +42,11 @@ public record DocumentoDto(
                 d.getClassificazione() == null ? null : d.getClassificazione().getVersione(),
                 d.getClassificazione() == null ? null : d.getClassificazione().codiciOrdinati(),
                 riclassificazioni, d.getHashSha256(), integro);
+    }
+
+        /** Nome del file da scaricare, es. notifica-incidente-1-v2.pdf */
+    public String nomeFile(String estensione) {
+        return tipo.name().toLowerCase(Locale.ROOT).replace('_', '-') + "-incidente-" + incidenteId
+                + "-v" + versione + "." + estensione;
     }
 }

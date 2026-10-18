@@ -11,6 +11,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 
 import com.csirt.notifiche.dto.ContenutoDto;
 import com.csirt.notifiche.dto.DocumentoDto;
@@ -18,6 +22,7 @@ import com.csirt.notifiche.dto.NuovoDocumento;
 import com.csirt.notifiche.dto.TracciaDto;
 import com.csirt.notifiche.service.DocumentoService;
 import com.csirt.notifiche.documenti.RegoleDocumento;
+import com.csirt.notifiche.dto.FileScaricabile;
 
 import jakarta.validation.Valid;
 
@@ -70,5 +75,24 @@ public class DocumentoController {
     @GetMapping("/incidenti/{id}/traccia")
     public TracciaDto traccia(@PathVariable Long id) {
         return service.traccia(id);
+    }
+
+    @GetMapping("/documenti/{id}/pdf")
+    public ResponseEntity<byte[]> pdf(@PathVariable Long id) {
+        FileScaricabile file = service.pdf(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment().filename(file.nome()).build().toString())
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(file.contenuto());
+    }
+
+    @GetMapping("/documenti/{id}/json")
+    public ResponseEntity<DocumentoDto> json(@PathVariable Long id) {
+        DocumentoDto documento = service.dettaglio(id);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment().filename(documento.nomeFile("json")).build().toString())
+                .contentType(MediaType.APPLICATION_JSON)
+                .body(documento);
     }
 }

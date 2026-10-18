@@ -26,6 +26,8 @@ import com.csirt.notifiche.model.StatoIncidente;
 import com.csirt.notifiche.model.TipoDocumento;
 import com.csirt.notifiche.repository.ClassificazioneRepository;
 import com.csirt.notifiche.repository.DocumentoRepository;
+import com.csirt.notifiche.dto.FileScaricabile;
+import com.csirt.notifiche.scadenze.Scadenza;
 
 @Service
 public class DocumentoService {
@@ -33,13 +35,15 @@ public class DocumentoService {
     private final DocumentoRepository documenti;
     private final ClassificazioneRepository classificazioni;
     private final IncidenteService incidenteService;
+    private final PdfGeneratorService pdf;
     private final Clock clock;
 
     public DocumentoService(DocumentoRepository documenti, ClassificazioneRepository classificazioni,
-                            IncidenteService incidenteService, Clock clock) {
+                            IncidenteService incidenteService, PdfGeneratorService pdf, Clock clock) {
         this.documenti = documenti;
         this.classificazioni = classificazioni;
         this.incidenteService = incidenteService;
+        this.pdf = pdf;
         this.clock = clock;
     }
 
@@ -114,6 +118,19 @@ public class DocumentoService {
     @Transactional(readOnly = true)
     public DocumentoDto dettaglio(Long documentoId) {
         return dto(trova(documentoId));
+    }
+
+    /** Versione stampabile del documento, con il termine e il suo stato. */
+    @Transactional(readOnly = true)
+    public FileScaricabile pdf(Long documentoId) {
+        Documento documento = trova(documentoId);
+        DocumentoDto dto = dto(documento);
+        Incidente incidente = documento.getIncidente();
+        Scadenza scadenza = incidenteService.scadenze(incidente.getId()).stream()
+                .filter(s -> s.tipo() == documento.getTipo())
+                .findFirst()
+                .orElse(null);
+        return new FileScaricabile(dto.nomeFile("pdf"), pdf.documento(dto, incidente, scadenza));
     }
 
     @Transactional(readOnly = true)

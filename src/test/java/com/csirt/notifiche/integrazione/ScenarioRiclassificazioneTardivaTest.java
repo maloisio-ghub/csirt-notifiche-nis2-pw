@@ -186,8 +186,8 @@ class ScenarioRiclassificazioneTardivaTest {
         assertTrue(incidenti.scadenze(id).stream().allMatch(s -> s.stato() == StatoScadenza.RISPETTATA));
 
         Files.createDirectories(Path.of("target"));
-        Files.writeString(Path.of("target", "traccia-riclassificazione.md"), markdown(prima, dopo, relazione),
-                StandardCharsets.UTF_8);
+        Files.writeString(Path.of("target", "traccia-riclassificazione.md"), markdown(prima, dopo, relazione), StandardCharsets.UTF_8);
+        Files.write(Path.of("target", "relazione-finale-scenario.pdf"), documenti.pdf(relazione.id()).contenuto());        
     }
 
     private static String markdown(TracciaDto prima, TracciaDto dopo, DocumentoDto relazione) {
