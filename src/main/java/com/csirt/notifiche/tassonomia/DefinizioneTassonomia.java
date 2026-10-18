@@ -1,0 +1,118 @@
+package com.csirt.notifiche.tassonomia;
+
+import java.util.ArrayList;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Pattern;
+
+import com.csirt.notifiche.model.TipoVoce;
+
+/**
+ * Contenuto di un file della tassonomia, validato prima di toccare il database:
+ * codici univoci e nel formato atteso, ogni voce sotto un padre del livello giusto,
+ * definito prima della voce e con codice coerente (BC -> BC:IM -> BC:IM_AV).
+ */
+public final class DefinizioneTassonomia {
+
+    public static final List<String> INTESTAZIONE =
+            List.of("tipo", "codice", "nome", "padre", "multiplo", "gruppo", "descrizione");
+
+    private static final Pattern CODICE_MACROCATEGORIA = Pattern.compile("[A-Z]{2}");
+    private static final Pattern CODICE_PREDICATO = Pattern.compile("[A-Z]{2}:[A-Z]{2}");
+    private static final Pattern CODICE_VALORE = Pattern.compile("[A-Z]{2}:[A-Z]{2}_[A-Za-z0-9_-]+");
+
+    private final List<RigaTassonomia> righe;
+
+    private DefinizioneTassonomia(List<RigaTassonomia> righe) {
+        this.righe = List.copyOf(righe);
+    }
+
+    public static DefinizioneTassonomia da(List<List<String>> csv) {
+        if (csv.isEmpty() || !csv.get(0).equals(INTESTAZIONE)) {
+            throw new TassonomiaNonValidaException("Intestazione attesa: " + String.join(";", INTESTAZIONE));
+        }
+        Map<String, TipoVoce> definite = new HashMap<>();
+        List<RigaTassonomia> righe = new ArrayList<>();
+        for (int i = 1; i < csv.size(); i++) {
+            int numero = i + 1;
+            List<String> colonne = csv.get(i);
+            if (colonne.size() != INTESTAZIONE.size()) {
+                throw errore(numero, "attese " + INTESTAZIONE.size() + " colonne, trovate " + colonne.size());
+            }
+            TipoVoce tipo;
+            try {
+                tipo = TipoVoce.valueOf(colonne.get(0));
+            } catch (IllegalArgumentException e) {
+                throw errore(numero, "tipo sconosciuto '" + colonne.get(0) + "'");
+            }
+            String codice = colonne.get(1);
+            String nome = colonne.get(2).trim();
+            String padre = colonne.get(3);
+            String multiplo = colonne.get(4);
+
+            if (nome.isEmpty()) {
+                throw errore(numero, "nome mancante per " + codice);
+            }
+            if (definite.containsKey(codice)) {
+                throw errore(numero, "codice duplicato " + codice);
+            }
+            switch (tipo) {
+                case MACROCATEGORIA -> {
+                    verificaFormato(CODICE_MACROCATEGORIA, codice, numero);
+                    if (!padre.isEmpty()) {
+                        throw errore(numero, "una macrocategoria non ha padre");
+                    }
+                }
+                case PREDICATO -> {
+                    verificaFormato(CODICE_PREDICATO, codice, numero);
+                    verificaPadre(definite, padre, TipoVoce.MACROCATEGORIA, numero);
+                    if (!codice.startsWith(padre + ":")) {
+                        throw errore(numero, codice + " non appartiene alla macrocategoria " + padre);
+                    }
+                }
+                case VALORE -> {
+                    verificaFormato(CODICE_VALORE, codice, numero);
+                    verificaPadre(definite, padre, TipoVoce.PREDICATO, numero);
+                    if (!codice.startsWith(padre + "_")) {
+                        throw errore(numero, codice + " non appartiene al predicato " + padre);
+                    }
+                }
+            }
+            if (!multiplo.equals("S") && !multiplo.equals("N")) {
+                throw errore(numero, "multiplo deve essere S o N");
+            }
+            definite.put(codice, tipo);
+            righe.add(new RigaTassonomia(tipo, codice, nome, padre, multiplo.equals("S"), colonne.get(5),
+                    colonne.get(6)));
+        }
+        return new DefinizioneTassonomia(righe);
+    }
+
+    public List<RigaTassonomia> righe() {
+        return righe;
+    }
+
+    public Map<TipoVoce, Long> conteggi() {
+        Map<TipoVoce, Long> conteggi = new EnumMap<>(TipoVoce.class);
+        righe.forEach(r -> conteggi.merge(r.tipo(), 1L, Long::sum));
+        return conteggi;
+    }
+
+    private static void verificaFormato(Pattern formato, String codice, int numero) {
+        if (!formato.matcher(codice).matches()) {
+            throw errore(numero, "codice '" + codice + "' non nel formato atteso");
+        }
+    }
+
+    private static void verificaPadre(Map<String, TipoVoce> definite, String padre, TipoVoce atteso, int numero) {
+        if (definite.get(padre) != atteso) {
+            throw errore(numero, "il padre '" + padre + "' non è una " + atteso + " già definita");
+        }
+    }
+
+    private static TassonomiaNonValidaException errore(int riga, String messaggio) {
+        return new TassonomiaNonValidaException("Riga " + riga + ": " + messaggio);
+    }
+}
