@@ -15,3 +15,4 @@ Generata dal codice (annotazioni @CampoNotifica su ContenutoNotifica). O = obbli
 | 9 | Descrizione dettagliata | – | – | O | art. 23.4.d.i |
 | 10 | Tipo di minaccia o causa principale | – | – | O | art. 23.4.d.ii |
 | 11 | Misure di attenuazione | – | F | O | art. 23.4.d.iii |
+| 12 | Classificazione TC-ACN | F | O | O | tassonomia ACN |

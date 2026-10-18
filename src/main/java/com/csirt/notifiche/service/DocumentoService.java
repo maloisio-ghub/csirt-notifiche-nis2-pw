@@ -10,25 +10,35 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.csirt.notifiche.documenti.RegoleDocumento;
+import com.csirt.notifiche.documenti.Riclassificazioni;
+import com.csirt.notifiche.documenti.Riclassificazioni.Riclassificazione;
+import com.csirt.notifiche.dto.ClassificazioneDto;
 import com.csirt.notifiche.dto.ContenutoDto;
 import com.csirt.notifiche.dto.DocumentoDto;
+import com.csirt.notifiche.dto.FotoDocumento;
+import com.csirt.notifiche.dto.TracciaDto;
+import com.csirt.notifiche.model.Classificazione;
 import com.csirt.notifiche.model.ContenutoNotifica;
 import com.csirt.notifiche.model.Documento;
 import com.csirt.notifiche.model.Incidente;
 import com.csirt.notifiche.model.StatoDocumento;
 import com.csirt.notifiche.model.StatoIncidente;
 import com.csirt.notifiche.model.TipoDocumento;
+import com.csirt.notifiche.repository.ClassificazioneRepository;
 import com.csirt.notifiche.repository.DocumentoRepository;
 
 @Service
 public class DocumentoService {
 
     private final DocumentoRepository documenti;
+    private final ClassificazioneRepository classificazioni;
     private final IncidenteService incidenteService;
     private final Clock clock;
 
-    public DocumentoService(DocumentoRepository documenti, IncidenteService incidenteService, Clock clock) {
+    public DocumentoService(DocumentoRepository documenti, ClassificazioneRepository classificazioni,
+                            IncidenteService incidenteService, Clock clock) {
         this.documenti = documenti;
+        this.classificazioni = classificazioni;
         this.incidenteService = incidenteService;
         this.clock = clock;
     }
@@ -54,7 +64,7 @@ public class DocumentoService {
                 .orElseGet(() -> contenutoIniziale(incidente));
 
         Documento documento = documenti.save(new Documento(incidente, tipo, versione, contenuto, Instant.now(clock)));
-        return DocumentoDto.da(documento);
+        return dto(documento);
     }
 
     /** Salvataggio in bozza: sostituisce il contenuto. */
@@ -66,10 +76,10 @@ public class DocumentoService {
         } catch (IllegalStateException e) {
             throw new OperazioneNonConsentitaException(e.getMessage());
         }
-        return DocumentoDto.da(documento);
+        return dto(documento);
     }
 
-    /** Trasmissione al CSIRT (simulata): ordine, completezza, impronta, chiusura del fascicolo. */
+    /** Trasmissione al CSIRT (simulata): ordine, completezza, classificazione, impronta, chiusura. */
     @Transactional
     public DocumentoDto trasmetti(Long documentoId) {
         Documento documento = trova(documentoId);
@@ -83,33 +93,67 @@ public class DocumentoService {
         }
         verificaOrdine(documento);
 
-        List<String> mancanti = RegoleDocumento.campiMancanti(documento.getContenuto(), documento.getTipo());
+        Classificazione classificazione = classificazioni.findByIncidenteIdAndAttivaTrue(incidente.getId()).orElse(null);
+        List<String> mancanti = RegoleDocumento.campiMancanti(documento.getContenuto(), classificazione != null,
+                documento.getTipo());
         if (!mancanti.isEmpty()) {
             throw new DocumentoIncompletoException(documento.getTipo(), mancanti);
         }
 
-        // Il database conserva i microsecondi: si tronca qui perché l'impronta resti verificabile dopo la rilettura.
+        List<Riclassificazione> riclassificazioni = riclassificazioniDopoLaNotifica(documento, classificazione);
         Instant adesso = Instant.now(clock).truncatedTo(ChronoUnit.MICROS);
-        documento.trasmetti(adesso, RegoleDocumento.sha256(RegoleDocumento.testoCanonico(documento, adesso)));
+        documento.trasmetti(adesso, classificazione, RegoleDocumento.sha256(
+                RegoleDocumento.testoCanonico(documento, adesso, classificazione, riclassificazioni)));
 
         if (documento.getTipo() == TipoDocumento.RELAZIONE_FINALE) {
             incidente.chiudi();
         }
-        return DocumentoDto.da(documento);
+        return dto(documento);
     }
 
     @Transactional(readOnly = true)
     public DocumentoDto dettaglio(Long documentoId) {
-        return DocumentoDto.da(trova(documentoId));
+        return dto(trova(documentoId));
     }
 
     @Transactional(readOnly = true)
     public List<DocumentoDto> elenco(Long incidenteId) {
         incidenteService.trova(incidenteId);
-        return documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream().map(DocumentoDto::da).toList();
+        return documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream().map(this::dto).toList();
     }
 
-    /** La notifica richiede la pre-notifica trasmessa; la relazione finale richiede la notifica trasmessa. */
+    /** Traccia di esecuzione: classificazioni e documenti con id, versione, stato e impronta. */
+    @Transactional(readOnly = true)
+    public TracciaDto traccia(Long incidenteId) {
+        Incidente incidente = incidenteService.trova(incidenteId);
+        List<ClassificazioneDto> storico = classificazioni.findByIncidenteIdOrderByVersioneAsc(incidenteId).stream()
+                .map(ClassificazioneDto::da).toList();
+        Integer attiva = classificazioni.findByIncidenteIdAndAttivaTrue(incidenteId)
+                .map(Classificazione::getVersione).orElse(null);
+        List<FotoDocumento> foto = documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream()
+                .map(d -> FotoDocumento.da(dto(d))).toList();
+        return new TracciaDto(incidenteId, incidente.getStato(), attiva, storico, foto, Instant.now(clock));
+    }
+
+    private DocumentoDto dto(Documento documento) {
+        Classificazione finale = documento.isTrasmesso()
+                ? documento.getClassificazione()
+                : classificazioni.findByIncidenteIdAndAttivaTrue(documento.getIncidente().getId()).orElse(null);
+        return DocumentoDto.da(documento, riclassificazioniDopoLaNotifica(documento, finale));
+    }
+
+    /** Solo per la relazione finale: i cambi di classificazione successivi alla notifica delle 72 ore. */
+    private List<Riclassificazione> riclassificazioniDopoLaNotifica(Documento documento, Classificazione finale) {
+        if (documento.getTipo() != TipoDocumento.RELAZIONE_FINALE) {
+            return List.of();
+        }
+        Classificazione allaNotifica = documenti.findFirstByIncidenteIdAndTipoAndStatoOrderByVersioneAsc(
+                        documento.getIncidente().getId(), TipoDocumento.NOTIFICA, StatoDocumento.TRASMESSO)
+                .map(Documento::getClassificazione)
+                .orElse(null);
+        return Riclassificazioni.tra(allaNotifica, finale);
+    }
+
     private void verificaOrdine(Documento documento) {
         TipoDocumento precedente = switch (documento.getTipo()) {
             case PRE_NOTIFICA -> null;

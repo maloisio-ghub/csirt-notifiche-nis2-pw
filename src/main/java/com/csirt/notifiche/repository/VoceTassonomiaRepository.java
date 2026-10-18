@@ -1,6 +1,7 @@
 package com.csirt.notifiche.repository;
 
 import java.util.List;
+import java.util.Collection;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -11,6 +12,7 @@ import com.csirt.notifiche.model.VoceTassonomia;
 public interface VoceTassonomiaRepository extends JpaRepository<VoceTassonomia, Long> {
 
     List<VoceTassonomia> findByVersioneIdOrderByOrdine(Long versioneId);
+    List<VoceTassonomia> findByVersioneIdAndCodiceIn(Long versioneId, Collection<String> codici);
 
     /** Query di conteggio per livello: è quella riportata nella relazione. */
     @Query(value = """

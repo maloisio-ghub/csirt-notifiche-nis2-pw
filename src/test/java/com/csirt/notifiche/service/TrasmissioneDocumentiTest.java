@@ -25,6 +25,7 @@ import com.csirt.notifiche.model.TipoDocumento;
 import com.csirt.notifiche.scadenze.CalcolatoreScadenze;
 import com.csirt.notifiche.scadenze.Scadenza;
 import com.csirt.notifiche.scadenze.StatoScadenza;
+import com.csirt.notifiche.dto.RichiestaClassificazione;
 
 @SpringBootTest
 @Transactional
@@ -46,6 +47,9 @@ class TrasmissioneDocumentiTest {
     @Autowired
     private DocumentoService documenti;
 
+    @Autowired
+    private ClassificazioneService classificazioni;
+
     private static ContenutoDto contenuto(GravitaIncidente gravita, String impatto, String dettaglio, String causa,
                                           String misure) {
         return new ContenutoDto("Mario Rossi", "soc@alfa.example", "Console SD-WAN irraggiungibile", false, false,
@@ -57,6 +61,7 @@ class TrasmissioneDocumentiTest {
                 Instant.parse("2026-10-17T08:00:00Z"))).getId();
         significativita.valuta(id, new RichiestaValutazione(null, null, null, null, null,
                 List.of(new ImpattoRichiesto("S1", 31, null, null, null, null))));
+                classificazioni.classifica(id, new RichiestaClassificazione(List.of("BC:IM_AV", "TT:AV_OU"), null));        
         return id;
     }
 

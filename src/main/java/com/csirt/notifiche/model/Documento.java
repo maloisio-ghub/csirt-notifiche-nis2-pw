@@ -66,6 +66,11 @@ public class Documento {
     @Column(name = "hash_sha256", length = 64)
     private String hashSha256;
 
+    /** Classificazione in vigore al momento della trasmissione: non cambia se l'incidente viene riclassificato. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "classificazione_id")
+    private Classificazione classificazione;
+
     /** Vero se nel database il documento risulta già trasmesso. Non è una colonna. */
     @Transient
     private boolean trasmessoNelDatabase;
@@ -93,10 +98,11 @@ public class Documento {
     }
 
     /** Trasmissione: da qui in poi il documento è immutabile. */
-    public void trasmetti(Instant momento, String impronta) {
+    public void trasmetti(Instant momento, Classificazione classificazioneInVigore, String impronta) {
         verificaBozza();
         this.stato = StatoDocumento.TRASMESSO;
         this.dataTrasmissione = momento;
+        this.classificazione = classificazioneInVigore;
         this.hashSha256 = impronta;
     }
 
@@ -146,4 +152,6 @@ public class Documento {
     public Instant getDataUltimaModifica() { return dataUltimaModifica; }
     public Instant getDataTrasmissione() { return dataTrasmissione; }
     public String getHashSha256() { return hashSha256; }
+    public Classificazione getClassificazione() { return classificazione; }
+    
 }

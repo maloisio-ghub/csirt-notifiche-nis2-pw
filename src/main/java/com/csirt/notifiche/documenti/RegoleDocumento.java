@@ -14,14 +14,16 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
+import com.csirt.notifiche.documenti.Riclassificazioni.Riclassificazione;
 import com.csirt.notifiche.model.CampoNotifica;
+import com.csirt.notifiche.model.Classificazione;
 import com.csirt.notifiche.model.ContenutoNotifica;
 import com.csirt.notifiche.model.Documento;
 import com.csirt.notifiche.model.TipoDocumento;
 
 /**
- * Regole dei documenti ricavate dalle annotazioni @CampoNotifica: matrice campo x adempimento,
- * campi mancanti, testo canonico e impronta SHA-256.
+ * Regole dei documenti: matrice campo x adempimento (dalle annotazioni @CampoNotifica più la
+ * classificazione TC-ACN), campi mancanti, testo canonico e impronta SHA-256.
  */
 public final class RegoleDocumento {
 
@@ -39,7 +41,6 @@ public final class RegoleDocumento {
         }
     }
 
-    /** Una riga della matrice. */
     public record Campo(String nome, String etichetta, int ordine, String riferimento,
                         Map<TipoDocumento, Requisito> requisiti) {
 
@@ -52,6 +53,9 @@ public final class RegoleDocumento {
         }
     }
 
+    /** Nome della riga della matrice dedicata alla classificazione (non è un campo del contenuto). */
+    public static final String CLASSIFICAZIONE = "classificazione";
+
     private static final List<Campo> MATRICE;
     private static final Map<String, Field> CAMPI = new HashMap<>();
 
@@ -62,30 +66,39 @@ public final class RegoleDocumento {
             if (regola == null) {
                 continue;
             }
-            Map<TipoDocumento, Requisito> requisiti = new EnumMap<>(TipoDocumento.class);
-            for (TipoDocumento tipo : TipoDocumento.values()) {
-                requisiti.put(tipo, Requisito.NON_PREVISTO);
-            }
-            for (TipoDocumento tipo : regola.facoltativoIn()) {
-                requisiti.put(tipo, Requisito.FACOLTATIVO);
-            }
-            for (TipoDocumento tipo : regola.obbligatorioIn()) {
-                if (requisiti.get(tipo) == Requisito.FACOLTATIVO) {
-                    throw new IllegalStateException("Campo " + field.getName()
-                            + " dichiarato sia obbligatorio sia facoltativo in " + tipo);
-                }
-                requisiti.put(tipo, Requisito.OBBLIGATORIO);
-            }
             field.setAccessible(true);
             CAMPI.put(field.getName(), field);
             campi.add(new Campo(field.getName(), regola.etichetta(), regola.ordine(), regola.riferimento(),
-                    Collections.unmodifiableMap(requisiti)));
+                    requisiti(field.getName(), regola.obbligatorioIn(), regola.facoltativoIn())));
         }
         campi.sort(Comparator.comparingInt(Campo::ordine));
+        // La classificazione TC-ACN: facoltativa nella pre-notifica, obbligatoria in notifica e relazione finale.
+        campi.add(new Campo(CLASSIFICAZIONE, "Classificazione TC-ACN", campi.size() + 1, "tassonomia ACN",
+                requisiti(CLASSIFICAZIONE,
+                        new TipoDocumento[] {TipoDocumento.NOTIFICA, TipoDocumento.RELAZIONE_FINALE},
+                        new TipoDocumento[] {TipoDocumento.PRE_NOTIFICA})));
         MATRICE = List.copyOf(campi);
     }
 
     private RegoleDocumento() {
+    }
+
+    private static Map<TipoDocumento, Requisito> requisiti(String nome, TipoDocumento[] obbligatorio,
+                                                          TipoDocumento[] facoltativo) {
+        Map<TipoDocumento, Requisito> requisiti = new EnumMap<>(TipoDocumento.class);
+        for (TipoDocumento tipo : TipoDocumento.values()) {
+            requisiti.put(tipo, Requisito.NON_PREVISTO);
+        }
+        for (TipoDocumento tipo : facoltativo) {
+            requisiti.put(tipo, Requisito.FACOLTATIVO);
+        }
+        for (TipoDocumento tipo : obbligatorio) {
+            if (requisiti.get(tipo) == Requisito.FACOLTATIVO) {
+                throw new IllegalStateException("Campo " + nome + " dichiarato sia obbligatorio sia facoltativo in " + tipo);
+            }
+            requisiti.put(tipo, Requisito.OBBLIGATORIO);
+        }
+        return Collections.unmodifiableMap(requisiti);
     }
 
     public static List<Campo> matrice() {
@@ -100,33 +113,47 @@ public final class RegoleDocumento {
         }
     }
 
-    /** Vuoto = non indicato, oppure testo fatto solo di spazi. */
     public static boolean vuoto(Object valore) {
         return valore == null || (valore instanceof String testo && testo.isBlank());
     }
 
-    /** Etichette dei campi obbligatori non compilati, nell'ordine della matrice. */
+    /** Campi del contenuto mancanti (la classificazione si considera presente). */
     public static List<String> campiMancanti(ContenutoNotifica contenuto, TipoDocumento tipo) {
+        return campiMancanti(contenuto, true, tipo);
+    }
+
+    /** Campi mancanti, compresa la classificazione TC-ACN se richiesta e assente. */
+    public static List<String> campiMancanti(ContenutoNotifica contenuto, boolean classificato, TipoDocumento tipo) {
         return MATRICE.stream()
                 .filter(campo -> campo.requisito(tipo) == Requisito.OBBLIGATORIO)
-                .filter(campo -> vuoto(valore(contenuto, campo)))
+                .filter(campo -> campo.nome().equals(CLASSIFICAZIONE) ? !classificato : vuoto(valore(contenuto, campo)))
                 .map(Campo::etichetta)
                 .toList();
     }
 
     /** Rappresentazione stabile del documento trasmesso, base dell'impronta. */
-    public static String testoCanonico(Documento documento, Instant dataTrasmissione) {
+    public static String testoCanonico(Documento documento, Instant dataTrasmissione, Classificazione classificazione,
+                                       List<Riclassificazione> riclassificazioni) {
         StringBuilder testo = new StringBuilder()
                 .append("incidente=").append(documento.getIncidente().getId()).append('\n')
                 .append("tipo=").append(documento.getTipo()).append('\n')
                 .append("versione=").append(documento.getVersione()).append('\n')
                 .append("dataTrasmissione=").append(dataTrasmissione).append('\n');
         for (Campo campo : MATRICE) {
-            if (campo.previstoIn(documento.getTipo())) {
+            if (campo.previstoIn(documento.getTipo()) && !campo.nome().equals(CLASSIFICAZIONE)) {
                 Object valore = valore(documento.getContenuto(), campo);
                 testo.append(campo.nome()).append('=')
                         .append(valore == null ? "" : valore.toString().replace("\n", "\\n")).append('\n');
             }
+        }
+        if (classificazione != null) {
+            testo.append("classificazione=v").append(classificazione.getVersione()).append(':')
+                    .append(classificazione.codiciOrdinati()).append('\n');
+        }
+        for (Riclassificazione r : riclassificazioni) {
+            testo.append("riclassificazione=v").append(r.versionePrecedente()).append("->v").append(r.versioneNuova())
+                    .append('@').append(r.momento()).append(':').append(r.motivazione().replace("\n", "\\n"))
+                    .append('\n');
         }
         return testo.toString();
     }
@@ -140,7 +167,6 @@ public final class RegoleDocumento {
         }
     }
 
-    /** La matrice in Markdown, da riportare nella relazione. */
     public static String matriceMarkdown() {
         StringBuilder md = new StringBuilder("# Matrice campo × adempimento\n\n")
                 .append("Generata dal codice (annotazioni @CampoNotifica su ContenutoNotifica). ")

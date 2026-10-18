@@ -25,10 +25,10 @@ class RegoleDocumentoTest {
     }
 
     @Test
-    @DisplayName("La matrice è ricavata dalle annotazioni: 11 campi in ordine")
+    @DisplayName("La matrice è ricavata dal codice: 11 campi più la classificazione")
     void matriceDalCodice() {
         List<RegoleDocumento.Campo> matrice = RegoleDocumento.matrice();
-        assertEquals(11, matrice.size());
+        assertEquals(12, matrice.size());
         for (int i = 0; i < matrice.size(); i++) {
             assertEquals(i + 1, matrice.get(i).ordine());
         }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.csirt.notifiche.dto.ContenutoDto;
 import com.csirt.notifiche.dto.DocumentoDto;
 import com.csirt.notifiche.dto.NuovoDocumento;
+import com.csirt.notifiche.dto.TracciaDto;
 import com.csirt.notifiche.service.DocumentoService;
 import com.csirt.notifiche.documenti.RegoleDocumento;
 
@@ -64,5 +65,10 @@ public class DocumentoController {
     @GetMapping(value = "/documenti/matrice.md", produces = "text/markdown;charset=UTF-8")
     public String matriceMarkdown() {
         return RegoleDocumento.matriceMarkdown();
+    }
+
+    @GetMapping("/incidenti/{id}/traccia")
+    public TracciaDto traccia(@PathVariable Long id) {
+        return service.traccia(id);
     }
 }
