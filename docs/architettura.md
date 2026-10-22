@@ -122,7 +122,7 @@ sequenceDiagram
 | Interfaccia web | Testi inseriti nel DOM sempre come testo, mai come HTML | Protezione dal cross-site scripting (XSS) |
 | Console H2 | Non inclusa | Evita l'esposizione del database in rete |
 | CORS | Nessuna apertura | Interfaccia e API sono servite dalla stessa origine |
-| Autenticazione e ruoli | Assenti | Fuori perimetro del prototipo: vedi [registro delle decisioni](decisioni.md), limiti noti |
+| Autenticazione e ruoli | Assenti | Fuori perimetro del prototipo: vedi i limiti del prototipo nel [README](../README.md) |
 
 ## Deploy
 

@@ -11,9 +11,7 @@ import com.csirt.notifiche.model.StatoDocumento;
 import com.csirt.notifiche.model.TipoDocumento;
 
 /**
- * versioneClassificazione e classificazione: quella fissata alla trasmissione (null in bozza).
- * riclassificazioni: solo per la relazione finale, i cambi avvenuti dopo la notifica.
- * integro: per un documento trasmesso, vero se l'impronta ricalcolata coincide con quella salvata.
+ riclassificazioni: solo per la relazione finale, i cambi avvenuti dopo la notifica.
  */
 public record DocumentoDto(
         Long id,

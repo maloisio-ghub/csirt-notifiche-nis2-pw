@@ -8,7 +8,7 @@ import com.csirt.notifiche.service.TassonomiaService;
 
 /**
  * All'avvio carica le versioni della tassonomia elencate nel manifest. Se un file è malformato
- * l'applicazione non parte: meglio fermarsi che classificare con una tassonomia incompleta.
+ * l'applicazione non parte
  */
 @Component
 public class CaricamentoTassonomia implements ApplicationRunner {

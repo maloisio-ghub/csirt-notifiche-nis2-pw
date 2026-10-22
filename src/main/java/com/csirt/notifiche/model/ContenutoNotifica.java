@@ -10,8 +10,7 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 
 /**
- * Contenuto comune ai tre adempimenti. I Boolean sono oggetti e non primitivi:
- * null significa "non ancora indicato", che è diverso da "no".
+ * Contenuto comune ai tre adempimenti.
  */
 @Embeddable
 public class ContenutoNotifica {

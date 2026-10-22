@@ -141,7 +141,7 @@ erDiagram
 
 `servizio_critico` non ha chiavi esterne verso altre tabelle: codice e base utenti del servizio sono
 **copiati** in `valutazione_impatto` al momento della valutazione, perché la valutazione deve restare una
-fotografia dei dati usati anche se in futuro la base utenti cambia (decisione D3).
+fotografia dei dati usati anche se in futuro la base utenti cambia.
 
 ## Vincoli principali
 

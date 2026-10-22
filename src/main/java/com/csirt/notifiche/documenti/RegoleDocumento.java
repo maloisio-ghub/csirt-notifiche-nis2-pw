@@ -53,7 +53,7 @@ public final class RegoleDocumento {
         }
     }
 
-    /** Nome della riga della matrice dedicata alla classificazione (non è un campo del contenuto). */
+    /** Nome della riga della matrice dedicata alla classificazione. */
     public static final String CLASSIFICAZIONE = "classificazione";
 
     private static final List<Campo> MATRICE;
@@ -117,7 +117,7 @@ public final class RegoleDocumento {
         return valore == null || (valore instanceof String testo && testo.isBlank());
     }
 
-    /** Campi del contenuto mancanti (la classificazione si considera presente). */
+    /** Campi del contenuto mancanti. */
     public static List<String> campiMancanti(ContenutoNotifica contenuto, TipoDocumento tipo) {
         return campiMancanti(contenuto, true, tipo);
     }

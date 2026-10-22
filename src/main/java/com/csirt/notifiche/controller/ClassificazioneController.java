@@ -27,7 +27,7 @@ public class ClassificazioneController {
         this.service = service;
     }
 
-    /** Prima classificazione o riclassificazione (in tal caso la motivazione è obbligatoria). */
+    /** Prima classificazione o riclassificazione. */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public ClassificazioneDto classifica(@PathVariable Long id, @Valid @RequestBody RichiestaClassificazione richiesta) {
