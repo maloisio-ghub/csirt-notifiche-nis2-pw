@@ -1,5 +1,5 @@
 # ---- Stadio 1: compilazione con Maven ----
-FROM maven:3.9-eclipse-temurin-17 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 WORKDIR /app
 
 # Prima solo il pom: le dipendenze vengono scaricate una volta e messe in cache
@@ -11,7 +11,7 @@ COPY src src
 RUN mvn -q -B -DskipTests package
 
 # ---- Stadio 2: esecuzione con il solo JRE ----
-FROM eclipse-temurin:17-jre
+FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 # Utente senza privilegi: l'applicazione non gira come root

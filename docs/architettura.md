@@ -12,7 +12,7 @@ flowchart TB
         UI["index.html · app.js · app.css<br/>(JavaScript senza framework)"]
     end
 
-    subgraph App["Applicazione Spring Boot 4 · Java 17"]
+    subgraph App["Applicazione Spring Boot 4 · Java 25"]
         direction TB
         subgraph C["Livello controller · REST, @Valid, errori RFC 9457"]
             IC[IncidenteController]
