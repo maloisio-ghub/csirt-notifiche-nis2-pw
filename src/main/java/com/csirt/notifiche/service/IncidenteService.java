@@ -50,7 +50,7 @@ public class IncidenteService {
         return repository.findAll(Sort.by(Sort.Direction.DESC, "dataRegistrazione"));
     }
 
-    /** Termini dell'incidente, con l'esito per i documenti già trasmessi (prima versione di ogni tipo). */
+    /** Termini dell'incidente, con l'esito per i documenti già trasmessi. */
     @Transactional(readOnly = true)
     public List<Scadenza> scadenze(Long id) {
         Incidente incidente = trova(id);

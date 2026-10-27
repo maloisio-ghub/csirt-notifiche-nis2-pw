@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.csirt.notifiche.model.TipoDocumento;
 
-/** Mancano campi obbligatori per l'adempimento. Diventa 422. */
+
 public class DocumentoIncompletoException extends RuntimeException {
 
     private final List<String> campiMancanti;

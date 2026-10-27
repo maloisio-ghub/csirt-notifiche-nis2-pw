@@ -7,8 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Lettore CSV minimale: separatore ";", campi tra virgolette quando contengono ";" o virgolette
- * (le virgolette interne sono raddoppiate), righe terminate da \n o \r\n.
+ * Lettore CSV minimale
  */
 public final class LettoreCsv {
 

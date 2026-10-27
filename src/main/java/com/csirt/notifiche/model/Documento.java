@@ -62,7 +62,7 @@ public class Documento {
     @Column(name = "data_trasmissione")
     private Instant dataTrasmissione;
 
-    /** Impronta SHA-256 del testo canonico, calcolata alla trasmissione. */
+    /** Impronta SHA-256, calcolata alla trasmissione. */
     @Column(name = "hash_sha256", length = 64)
     private String hashSha256;
 
@@ -113,7 +113,7 @@ public class Documento {
         }
     }
 
-    // Seconda linea di difesa: anche se qualcuno aggirasse i metodi sopra,
+    // linea di difesa: anche se qualcuno aggirasse i metodi sopra,
     // Hibernate rifiuta di aggiornare o cancellare una riga già trasmessa.
 
     @PostLoad

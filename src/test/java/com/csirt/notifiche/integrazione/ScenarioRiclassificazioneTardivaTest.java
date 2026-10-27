@@ -157,7 +157,7 @@ class ScenarioRiclassificazioneTardivaTest {
         orologio.imposta(t("2026-10-21T11:05:00Z"));
         TracciaDto dopo = documenti.traccia(id);
 
-        // I documenti trasmessi sono identici prima e dopo: stessi id, versioni, stato, classificazione e impronta.
+
         assertEquals(prima.documenti(), dopo.documenti());
         assertTrue(dopo.documenti().stream().allMatch(d -> d.versioneClassificazione() == 1 && d.integro()));
         assertEquals(1, prima.classificazioneAttiva());

@@ -10,7 +10,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** Una versione della TC-ACN caricata nel sistema. Una volta caricata non si modifica. */
+/** Una versione della TC-ACN caricata nel sistema. */
 @Entity
 @Table(name = "versione_tassonomia")
 public class VersioneTassonomia {
@@ -31,11 +31,11 @@ public class VersioneTassonomia {
     @Column(name = "data_pubblicazione")
     private LocalDate dataPubblicazione;
 
-    /** Data di acquisizione del documento ufficiale (requisito 2 della traccia). */
+    /** Data di acquisizione del documento ufficiale. */
     @Column(name = "data_acquisizione", nullable = false)
     private LocalDate dataAcquisizione;
 
-    /** Impronta del PDF ufficiale: identifica la copia esatta usata. */
+    /** Impronta del PDF ufficiale. */
     @Column(name = "sha256_documento", length = 64)
     private String sha256Documento;
 
@@ -45,7 +45,7 @@ public class VersioneTassonomia {
     @Column(name = "data_caricamento", nullable = false)
     private Instant dataCaricamento;
 
-    /** Solo la versione attiva si usa per le nuove classificazioni. */
+    
     @Column(name = "attiva", nullable = false)
     private boolean attiva;
 

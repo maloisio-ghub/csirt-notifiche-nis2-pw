@@ -83,7 +83,7 @@ public class DocumentoService {
         return dto(documento);
     }
 
-    /** Trasmissione al CSIRT (simulata): ordine, completezza, classificazione, impronta, chiusura. */
+    /** Trasmissione al CSIRT: ordine, completezza, classificazione, impronta, chiusura. */
     @Transactional
     public DocumentoDto trasmetti(Long documentoId) {
         Documento documento = trova(documentoId);

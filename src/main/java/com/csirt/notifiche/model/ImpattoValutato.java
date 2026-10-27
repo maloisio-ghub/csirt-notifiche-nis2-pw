@@ -5,7 +5,7 @@ import com.csirt.notifiche.significativita.ImpattoServizio;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 
-/** Impatto su un servizio come era al momento della valutazione (base utenti compresa). */
+/** Impatto su un servizio come era al momento della valutazione. */
 @Embeddable
 public class ImpattoValutato {
 

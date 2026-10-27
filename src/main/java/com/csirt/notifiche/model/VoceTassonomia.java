@@ -13,7 +13,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
-/** Una voce della TC-ACN (macrocategoria, predicato o valore) di una certa versione. */
+/** Una voce della TC-ACN (macrocategoria, predicato o valore). */
 @Entity
 @Table(name = "voce_tassonomia", uniqueConstraints = @UniqueConstraint(
         name = "uk_voce_versione_codice", columnNames = {"versione_id", "codice"}))
@@ -36,7 +36,7 @@ public class VoceTassonomia {
     @Column(name = "tipo", nullable = false, length = 20)
     private TipoVoce tipo;
 
-    /** Codice ufficiale, riportato esattamente come nel documento ACN. */
+    /** Codice ufficiale, riportato come nel documento ACN. */
     @Column(name = "codice", nullable = false, length = 40)
     private String codice;
 
@@ -50,7 +50,7 @@ public class VoceTassonomia {
     @Column(name = "selezione_multipla", nullable = false)
     private boolean selezioneMultipla;
 
-    /** Sotto-predicato di raggruppamento (solo valori di Involved Asset). Non è un livello. */
+    /** Sotto-predicato di raggruppamento (solo valori di Involved Asset). */
     @Column(name = "gruppo", length = 100)
     private String gruppo;
 

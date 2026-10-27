@@ -97,7 +97,7 @@ class ModelloDatiDocumentatoTest {
         Files.writeString(destinazione, ddl.toString(), StandardCharsets.UTF_8);
     }
 
-    /** Entità dichiarate nel blocco mermaid erDiagram (righe "    nome {"). */
+    /** Entità dichiarate nel blocco mermaid (righe "    nome {"). */
     static Set<String> tabelleDiagrammaEr(String documento) {
         int inizio = documento.indexOf("erDiagram");
         int fine = documento.indexOf("```", inizio);

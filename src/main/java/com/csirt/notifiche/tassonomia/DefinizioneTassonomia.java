@@ -10,9 +10,7 @@ import java.util.regex.Pattern;
 import com.csirt.notifiche.model.TipoVoce;
 
 /**
- * Contenuto di un file della tassonomia, validato prima di toccare il database:
- * codici univoci e nel formato atteso, ogni voce sotto un padre del livello giusto,
- * definito prima della voce e con codice coerente (BC -> BC:IM -> BC:IM_AV).
+ * Contenuto di un file della tassonomia validato
  */
 public final class DefinizioneTassonomia {
 

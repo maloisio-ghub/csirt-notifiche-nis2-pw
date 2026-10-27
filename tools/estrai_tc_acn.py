@@ -27,7 +27,7 @@ SOTTOPREDICATO = re.compile(r'Figura\s+\d+:\s+Sotto-predicato\s+"(.+?)"')
 RUMORE = re.compile(r"^\s*(La Tassonomia Cyber dell.ACN\s+\d+|Figura\s+\d+:.*)\s*$")
 
 # Predicati a selezione singola: un incidente ha una sola gravita' e una sola tendenza.
-# E' una scelta progettuale, non un'indicazione del documento ACN (vedi tabella delle discrepanze).
+
 PREDICATI_SELEZIONE_SINGOLA = {"BC:SE", "AC:OU"}
 
 

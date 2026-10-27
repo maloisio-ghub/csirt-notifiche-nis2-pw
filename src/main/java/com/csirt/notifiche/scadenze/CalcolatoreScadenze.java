@@ -20,7 +20,7 @@ public class CalcolatoreScadenze {
     static final Duration TERMINE_PRE_NOTIFICA = Duration.ofHours(24);
     static final Duration TERMINE_NOTIFICA = Duration.ofHours(72);
 
-    /** Variante semplice: è nota al più la trasmissione della notifica. */
+ 
     public List<Scadenza> calcola(Instant conoscenza, Instant trasmissioneNotifica, Instant adesso) {
         Map<TipoDocumento, Instant> trasmissioni = new EnumMap<>(TipoDocumento.class);
         if (trasmissioneNotifica != null) {

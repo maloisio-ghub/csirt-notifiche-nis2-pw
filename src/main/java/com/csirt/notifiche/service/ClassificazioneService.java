@@ -81,7 +81,7 @@ public class ClassificazioneService {
                 .map(ClassificazioneDto::da).toList();
     }
 
-    /** Solo valori esistenti nella versione attiva, e al più uno per i predicati a selezione singola. */
+    
     private Set<VoceTassonomia> valoriValidati(VersioneTassonomia tassonomia, List<String> codici) {
         Set<String> richiesti = new TreeSet<>(codici);
         List<VoceTassonomia> trovate = voci.findByVersioneIdAndCodiceIn(tassonomia.getId(), richiesti);

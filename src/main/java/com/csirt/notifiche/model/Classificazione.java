@@ -20,7 +20,7 @@ import jakarta.persistence.UniqueConstraint;
 
 /**
  * Classificazione TC-ACN di un incidente. Ogni cambiamento è una nuova versione collegata alla
- * precedente, con momento e motivazione; le versioni precedenti restano consultabili.
+ * precedente, con momento e motivazione.
  */
 @Entity
 @Table(name = "classificazione", uniqueConstraints = @UniqueConstraint(
@@ -103,7 +103,7 @@ public class Classificazione {
                 motivazione.trim(), this);
     }
 
-    /** Codici ordinati alfabeticamente, separati da virgola: forma stabile per confronti e impronte. */
+    /** Codici ordinati, separati da virgola: forma stabile per confronti e impronte. */
     public String codiciOrdinati() {
         return codici(valori);
     }

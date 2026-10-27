@@ -3,7 +3,7 @@ package com.csirt.notifiche.dto;
 import com.csirt.notifiche.model.StatoDocumento;
 import com.csirt.notifiche.model.TipoDocumento;
 
-/** Stato sintetico di un documento in un certo istante, per la traccia di esecuzione. */
+/** Stato sintetico di un documento, per la traccia di esecuzione. */
 public record FotoDocumento(Long id, TipoDocumento tipo, int versione, StatoDocumento stato,
                             Integer versioneClassificazione, String hashSha256, Boolean integro) {
 

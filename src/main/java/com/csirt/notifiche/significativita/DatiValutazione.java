@@ -3,7 +3,7 @@ package com.csirt.notifiche.significativita;
 import java.math.BigDecimal;
 import java.util.List;
 
-/** Tutto ciò che serve per decidere se un incidente è significativo. */
+/** Quello che serve per decidere se un incidente è significativo. */
 public record DatiValutazione(
         BigDecimal perditaEconomica,
         boolean esfiltrazioneSegretiCommerciali,

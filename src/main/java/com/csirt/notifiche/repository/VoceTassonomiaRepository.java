@@ -14,7 +14,7 @@ public interface VoceTassonomiaRepository extends JpaRepository<VoceTassonomia, 
     List<VoceTassonomia> findByVersioneIdOrderByOrdine(Long versioneId);
     List<VoceTassonomia> findByVersioneIdAndCodiceIn(Long versioneId, Collection<String> codici);
 
-    /** Query di conteggio per livello: è quella riportata nella relazione. */
+    /** Query di conteggio per livello. */
     @Query(value = """
             SELECT v.tipo AS tipo, COUNT(*) AS numero
             FROM voce_tassonomia v
@@ -25,7 +25,7 @@ public interface VoceTassonomiaRepository extends JpaRepository<VoceTassonomia, 
             """, nativeQuery = true)
     List<Object[]> contaPerTipo(@Param("codice") String codice);
 
-    /** Predicati e valori per macrocategoria (i codici iniziano con quello della macrocategoria). */
+    /** Predicati e valori per macrocategoria. */
     @Query(value = """
             SELECT m.codice AS macrocategoria,
                    SUM(CASE WHEN v.tipo = 'PREDICATO' THEN 1 ELSE 0 END) AS predicati,

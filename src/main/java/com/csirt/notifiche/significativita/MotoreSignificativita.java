@@ -33,7 +33,7 @@ public class MotoreSignificativita {
                     "accesso non autorizzato presumibilmente malevolo, con possibile grave perturbazione"));
         }
 
-        // Criteri per fornitori di servizi gestiti e di sicurezza gestiti (art. 10)
+        // Criteri per  (art. 10)
         for (ImpattoServizio s : dati.impatti()) {
             long sogliaUtenti = p.sogliaUtenti(s.baseUtenti());
             String servizio = " [" + s.codiceServizio() + "]";

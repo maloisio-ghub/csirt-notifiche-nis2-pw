@@ -1,9 +1,8 @@
 'use strict';
 
 /*
- * Interfaccia web delle notifiche NIS2. JavaScript senza framework: parla con le API REST
- * del backend e non contiene regole di business. Soglie, campi obbligatori e matrice
- * arrivano dal server; qui si costruiscono solo i moduli e si mostrano gli esiti.
+ * Interfaccia web delle notifiche NIS2.
+ * Soglie, campi obbligatori e matrice arrivano dal server.
  */
 
 const ADEMPIMENTI = [
@@ -12,7 +11,7 @@ const ADEMPIMENTI = [
     { tipo: 'RELAZIONE_FINALE', etichetta: 'Relazione finale', termine: 'entro un mese dalla notifica' },
 ];
 
-/** Tipo di controllo per i campi del contenuto; i campi non elencati sono testi lunghi. */
+/** Tipo di controllo per i campi del contenuto. */
 const CONTROLLI = {
     referenteNome: 'testo',
     referenteEmail: 'email',
@@ -58,7 +57,7 @@ async function api(metodo, percorso, corpo) {
     return dati;
 }
 
-/** Crea un elemento DOM. Il testo è sempre inserito come testo, mai come HTML. */
+
 function el(tag, attributi = {}, ...figli) {
     const elemento = document.createElement(tag);
     for (const [nome, valore] of Object.entries(attributi)) {
@@ -105,7 +104,7 @@ function numeroOppureNull(valore) {
     return Number.isNaN(numero) ? null : numero;
 }
 
-/** Mostra un messaggio in un contenitore; per gli errori elenca anche campi errati o mancanti. */
+
 function messaggio(contenitore, testo, tipo = 'errore', voci = []) {
     contenitore.replaceChildren(el('div', { class: `messaggio ${tipo}` },
         testo,
@@ -413,7 +412,7 @@ function moduloClassificazione(inc, attiva) {
     if (!attiva) {
         return el('div', {}, modulo, box);
     }
-    // Con una classificazione già attiva l'editor resta chiuso: si apre solo per riclassificare.
+ 
     return el('details', { class: 'macro' }, el('summary', {}, 'Riclassifica l\'incidente'),
         el('div', { style: 'padding: .7rem' }, modulo, box));
 }
@@ -548,7 +547,7 @@ function campoModulo(campo, documento) {
         controllo);
 }
 
-/** Il PUT sostituisce tutto il contenuto: si parte da quello attuale e si sovrascrivono i campi del modulo. */
+/** Il PUT sostituisce tutto il contenuto. */
 function contenutoDalModulo(documento, modulo) {
     const contenuto = { ...documento.contenuto };
     modulo.querySelectorAll('[data-campo]').forEach((controllo) => {

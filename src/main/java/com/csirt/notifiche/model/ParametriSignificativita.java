@@ -12,7 +12,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** Soglie di significatività versionate: una nuova versione non modifica le precedenti. */
+/** Soglie di significatività versionate. */
 @Entity
 @Table(name = "parametri_significativita")
 public class ParametriSignificativita {
