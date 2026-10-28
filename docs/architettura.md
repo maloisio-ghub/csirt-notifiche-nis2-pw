@@ -72,7 +72,7 @@ repository. Le regole di dominio non conoscono né HTTP né il database.
 | Interfaccia | `static/` | Guida l'operatore; costruisce i moduli dalla matrice e dalla tassonomia ricevute dal backend | Non duplica regole, soglie o campi obbligatori |
 | Controller | `controller`, `dto` | Traduce HTTP in chiamate ai servizi; valida il formato (`@Valid`); errori RFC 9457 (400, 404, 409, 422) | Nessuna logica di business |
 | Servizi | `service` | Transazioni, ordine degli adempimenti, riuso dei dati, trasmissione, classificazione, PDF | Non conosce HTTP |
-| Regole di dominio | `significativita`, `scadenze`, `documenti`, `tassonomia` | Regole R1–R10, calcolo dei termini, matrice dei campi e impronta, catena delle riclassificazioni, validazione della tassonomia | Non accede al database |
+| Regole di dominio | `significativita`, `scadenze`, `documenti`, `tassonomia` | Regole R1–R10, calcolo dei termini, matrice dei campi, riclassificazioni successive alla notifica, validazione della tassonomia | Non accede al database |
 | Modello | `model` | Entità JPA e invarianti: transizioni di stato, immutabilità dei documenti trasmessi, versioni delle classificazioni | |
 | Persistenza | `repository` | Query derivate dal nome dei metodi; query SQL native di conteggio della tassonomia | |
 | Configurazione | `config` | Orologio di sistema (`Clock`) e caricamento della tassonomia all'avvio | |

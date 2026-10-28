@@ -1,28 +1,14 @@
 package com.csirt.notifiche.documenti;
 
-import java.lang.reflect.Field;
-import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
-import com.csirt.notifiche.model.CampoNotifica;
 import com.csirt.notifiche.model.ContenutoNotifica;
-import com.csirt.notifiche.model.Documento;
 import com.csirt.notifiche.model.TipoDocumento;
 
-/**
- * Regole dei documenti: matrice campo x adempimento (dalle annotazioni @CampoNotifica più la
- *  * classificazione TC-ACN) e campi mancanti per ciascun adempimento.
- */
+/** Regole dei documenti: matrice campo x adempimento e campi mancanti per ciascun adempimento. */
 public final class RegoleDocumento {
 
     public enum Requisito {
@@ -54,61 +40,57 @@ public final class RegoleDocumento {
     /** Nome della riga della matrice dedicata alla classificazione. */
     public static final String CLASSIFICAZIONE = "classificazione";
 
-    private static final List<Campo> MATRICE;
-    private static final Map<String, Field> CAMPI = new HashMap<>();
+    private static final Requisito O = Requisito.OBBLIGATORIO;
+    private static final Requisito F = Requisito.FACOLTATIVO;
+    private static final Requisito N = Requisito.NON_PREVISTO;
 
-    static {
-        List<Campo> campi = new ArrayList<>();
-        for (Field field : ContenutoNotifica.class.getDeclaredFields()) {
-            CampoNotifica regola = field.getAnnotation(CampoNotifica.class);
-            if (regola == null) {
-                continue;
-            }
-            field.setAccessible(true);
-            CAMPI.put(field.getName(), field);
-            campi.add(new Campo(field.getName(), regola.etichetta(), regola.ordine(), regola.riferimento(),
-                    requisiti(field.getName(), regola.obbligatorioIn(), regola.facoltativoIn())));
-        }
-        campi.sort(Comparator.comparingInt(Campo::ordine));
-        // La classificazione TC-ACN: facoltativa nella pre-notifica, obbligatoria in notifica e relazione finale.
-        campi.add(new Campo(CLASSIFICAZIONE, "Classificazione TC-ACN", campi.size() + 1, "tassonomia ACN",
-                requisiti(CLASSIFICAZIONE,
-                        new TipoDocumento[] {TipoDocumento.NOTIFICA, TipoDocumento.RELAZIONE_FINALE},
-                        new TipoDocumento[] {TipoDocumento.PRE_NOTIFICA})));
-        MATRICE = List.copyOf(campi);
-    }
+    /** Per ogni campo: requisito in pre-notifica, notifica e relazione finale. */
+    private static final List<Campo> MATRICE = List.of(
+            campo(1, "referenteNome", "Referente - nome", "punto di contatto", O, O, O),
+            campo(2, "referenteEmail", "Referente - e-mail", "punto di contatto", O, O, O),
+            campo(3, "descrizioneSintetica", "Descrizione sintetica", "art. 23.4", O, O, O),
+            campo(4, "sospettoMalevolo", "Sospetto di atto illegittimo o malevolo", "art. 23.4.a", O, O, F),
+            campo(5, "impattoTransfrontaliero", "Impatto transfrontaliero", "art. 23.4.a, 23.4.d.iv", O, O, O),
+            campo(6, "gravita", "Gravità", "art. 23.4.b, 23.4.d.i", N, O, O),
+            campo(7, "impatto", "Impatto", "art. 23.4.b, 23.4.d.i", N, O, O),
+            campo(8, "indicatoriCompromissione", "Indicatori di compromissione", "art. 23.4.b", N, F, F),
+            campo(9, "descrizioneDettagliata", "Descrizione dettagliata", "art. 23.4.d.i", N, N, O),
+            campo(10, "causaPrincipale", "Tipo di minaccia o causa principale", "art. 23.4.d.ii", N, N, O),
+            campo(11, "misureMitigazione", "Misure di attenuazione", "art. 23.4.d.iii", N, F, O),
+            campo(12, CLASSIFICAZIONE, "Classificazione TC-ACN", "tassonomia ACN", F, O, O));
 
     private RegoleDocumento() {
     }
 
-    private static Map<TipoDocumento, Requisito> requisiti(String nome, TipoDocumento[] obbligatorio,
-                                                          TipoDocumento[] facoltativo) {
+    private static Campo campo(int ordine, String nome, String etichetta, String riferimento,
+                               Requisito preNotifica, Requisito notifica, Requisito relazioneFinale) {
         Map<TipoDocumento, Requisito> requisiti = new EnumMap<>(TipoDocumento.class);
-        for (TipoDocumento tipo : TipoDocumento.values()) {
-            requisiti.put(tipo, Requisito.NON_PREVISTO);
-        }
-        for (TipoDocumento tipo : facoltativo) {
-            requisiti.put(tipo, Requisito.FACOLTATIVO);
-        }
-        for (TipoDocumento tipo : obbligatorio) {
-            if (requisiti.get(tipo) == Requisito.FACOLTATIVO) {
-                throw new IllegalStateException("Campo " + nome + " dichiarato sia obbligatorio sia facoltativo in " + tipo);
-            }
-            requisiti.put(tipo, Requisito.OBBLIGATORIO);
-        }
-        return Collections.unmodifiableMap(requisiti);
+        requisiti.put(TipoDocumento.PRE_NOTIFICA, preNotifica);
+        requisiti.put(TipoDocumento.NOTIFICA, notifica);
+        requisiti.put(TipoDocumento.RELAZIONE_FINALE, relazioneFinale);
+        return new Campo(nome, etichetta, ordine, riferimento, Collections.unmodifiableMap(requisiti));
     }
 
     public static List<Campo> matrice() {
         return MATRICE;
     }
 
-    public static Object valore(ContenutoNotifica contenuto, Campo campo) {
-        try {
-            return CAMPI.get(campo.nome()).get(contenuto);
-        } catch (IllegalAccessException e) {
-            throw new IllegalStateException(e);
-        }
+    /** Valore di un campo del contenuto. */
+    public static Object valore(ContenutoNotifica c, Campo campo) {
+        return switch (campo.nome()) {
+            case "referenteNome" -> c.getReferenteNome();
+            case "referenteEmail" -> c.getReferenteEmail();
+            case "descrizioneSintetica" -> c.getDescrizioneSintetica();
+            case "sospettoMalevolo" -> c.getSospettoMalevolo();
+            case "impattoTransfrontaliero" -> c.getImpattoTransfrontaliero();
+            case "gravita" -> c.getGravita();
+            case "impatto" -> c.getImpatto();
+            case "indicatoriCompromissione" -> c.getIndicatoriCompromissione();
+            case "descrizioneDettagliata" -> c.getDescrizioneDettagliata();
+            case "causaPrincipale" -> c.getCausaPrincipale();
+            case "misureMitigazione" -> c.getMisureMitigazione();
+            default -> throw new IllegalArgumentException("Campo sconosciuto: " + campo.nome());
+        };
     }
 
     public static boolean vuoto(Object valore) {
@@ -131,7 +113,7 @@ public final class RegoleDocumento {
 
     public static String matriceMarkdown() {
         StringBuilder md = new StringBuilder("# Matrice campo × adempimento\n\n")
-                .append("Generata dal codice (annotazioni @CampoNotifica su ContenutoNotifica). ")
+                .append("Generata dal codice (tabella MATRICE in RegoleDocumento). ")
                 .append("O = obbligatorio, F = facoltativo, – = non previsto.\n\n")
                 .append("| # | Campo");
         for (TipoDocumento tipo : TipoDocumento.values()) {

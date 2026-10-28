@@ -1,6 +1,6 @@
 # Matrice campo × adempimento
 
-Generata dal codice (annotazioni @CampoNotifica su ContenutoNotifica). O = obbligatorio, F = facoltativo, – = non previsto.
+Generata dal codice (tabella MATRICE in RegoleDocumento). O = obbligatorio, F = facoltativo, – = non previsto.
 
 | # | Campo | Pre-notifica | Notifica dell'incidente | Relazione finale | Riferimento |
 | --- | --- | --- | --- | --- | --- |
