@@ -14,16 +14,14 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Map;
 
-import com.csirt.notifiche.documenti.Riclassificazioni.Riclassificazione;
 import com.csirt.notifiche.model.CampoNotifica;
-import com.csirt.notifiche.model.Classificazione;
 import com.csirt.notifiche.model.ContenutoNotifica;
 import com.csirt.notifiche.model.Documento;
 import com.csirt.notifiche.model.TipoDocumento;
 
 /**
  * Regole dei documenti: matrice campo x adempimento (dalle annotazioni @CampoNotifica più la
- * classificazione TC-ACN), campi mancanti, testo canonico e impronta SHA-256.
+ *  * classificazione TC-ACN) e campi mancanti per ciascun adempimento.
  */
 public final class RegoleDocumento {
 
@@ -129,42 +127,6 @@ public final class RegoleDocumento {
                 .filter(campo -> campo.nome().equals(CLASSIFICAZIONE) ? !classificato : vuoto(valore(contenuto, campo)))
                 .map(Campo::etichetta)
                 .toList();
-    }
-
-    /** Rappresentazione stabile del documento trasmesso, base dell'impronta. */
-    public static String testoCanonico(Documento documento, Instant dataTrasmissione, Classificazione classificazione,
-                                       List<Riclassificazione> riclassificazioni) {
-        StringBuilder testo = new StringBuilder()
-                .append("incidente=").append(documento.getIncidente().getId()).append('\n')
-                .append("tipo=").append(documento.getTipo()).append('\n')
-                .append("versione=").append(documento.getVersione()).append('\n')
-                .append("dataTrasmissione=").append(dataTrasmissione).append('\n');
-        for (Campo campo : MATRICE) {
-            if (campo.previstoIn(documento.getTipo()) && !campo.nome().equals(CLASSIFICAZIONE)) {
-                Object valore = valore(documento.getContenuto(), campo);
-                testo.append(campo.nome()).append('=')
-                        .append(valore == null ? "" : valore.toString().replace("\n", "\\n")).append('\n');
-            }
-        }
-        if (classificazione != null) {
-            testo.append("classificazione=v").append(classificazione.getVersione()).append(':')
-                    .append(classificazione.codiciOrdinati()).append('\n');
-        }
-        for (Riclassificazione r : riclassificazioni) {
-            testo.append("riclassificazione=v").append(r.versionePrecedente()).append("->v").append(r.versioneNuova())
-                    .append('@').append(r.momento()).append(':').append(r.motivazione().replace("\n", "\\n"))
-                    .append('\n');
-        }
-        return testo.toString();
-    }
-
-    public static String sha256(String testo) {
-        try {
-            byte[] impronta = MessageDigest.getInstance("SHA-256").digest(testo.getBytes(StandardCharsets.UTF_8));
-            return HexFormat.of().formatHex(impronta);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException(e);
-        }
     }
 
     public static String matriceMarkdown() {

@@ -112,9 +112,8 @@ public class PdfGeneratorService {
             }
 
             Paragraph piede = new Paragraph(trasmesso
-                    ? "Impronta SHA-256: " + d.hashSha256() + " - integrità verificata: "
-                            + (Boolean.TRUE.equals(d.integro()) ? "sì" : "NO")
-                    : "Documento in bozza: l'impronta SHA-256 viene calcolata alla trasmissione.", PICCOLO);
+                    ? "Documento trasmesso: non più modificabile."
+                    : "Documento in bozza: non ancora trasmesso.", PICCOLO);
             piede.setSpacingBefore(14);
             pdf.add(piede);
             pdf.close();

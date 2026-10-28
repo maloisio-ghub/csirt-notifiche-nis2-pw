@@ -2,7 +2,6 @@ package com.csirt.notifiche.service;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -59,7 +58,7 @@ public class ClassificazioneService {
                 .orElseThrow(() -> new IllegalStateException("Nessuna versione della tassonomia attiva"));
         Set<VoceTassonomia> valori = valoriValidati(tassonomia, richiesta.codici());
         // Microsecondi, come nel database: il momento entra nell'impronta della relazione finale.
-        Instant adesso = Instant.now(clock).truncatedTo(ChronoUnit.MICROS);
+        Instant adesso = Instant.now(clock);
 
         Optional<Classificazione> attiva = classificazioni.findByIncidenteIdAndAttivaTrue(incidenteId);
         if (attiva.isEmpty()) {

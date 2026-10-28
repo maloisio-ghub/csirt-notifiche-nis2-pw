@@ -63,7 +63,7 @@ class PdfDocumentiTest {
     }
 
     @Test
-    @DisplayName("PDF di un documento trasmesso: nome del file, formato PDF, stato e impronta")
+    @DisplayName("PDF di un documento trasmesso: nome del file, formato PDF e stato")
     void pdfDocumentoTrasmesso() throws IOException {
         Long id = incidenteSignificativo();
         DocumentoDto bozza = documenti.crea(id, TipoDocumento.PRE_NOTIFICA);
@@ -77,7 +77,6 @@ class PdfDocumentiTest {
         String testo = testo(file.contenuto());
         assertTrue(testo.contains("CSIRT Italia"));
         assertTrue(testo.contains("TRASMESSO"));
-        assertTrue(testo.contains(pre.hashSha256().substring(0, 16)));
     }
 
     @Test

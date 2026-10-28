@@ -125,14 +125,12 @@ class TrasmissioneDocumentiTest {
     }
 
     @Test
-    @DisplayName("Un documento trasmesso è immutabile e la sua impronta è verificabile")
+    @DisplayName("Un documento trasmesso è immutabile: le modifiche richiedono una nuova versione")
     void documentoTrasmessoImmutabile() {
         Long id = incidenteSignificativo();
         DocumentoDto pre = trasmesso(id, TipoDocumento.PRE_NOTIFICA, PRE);
 
         assertEquals(StatoDocumento.TRASMESSO, pre.stato());
-        assertEquals(64, pre.hashSha256().length());
-        assertTrue(pre.integro());
         assertThrows(OperazioneNonConsentitaException.class, () -> documenti.aggiorna(pre.id(), NOTIFICA));
         assertThrows(OperazioneNonConsentitaException.class, () -> documenti.trasmetti(pre.id()));
 

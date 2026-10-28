@@ -479,7 +479,6 @@ function riepilogoTrasmesso(d) {
         distintivo('TRASMESSO'), ` v${d.versione} · ${data(d.dataTrasmissione)}`,
         d.versioneClassificazione ? ` · classificazione v${d.versioneClassificazione}` : '',
         el('br'),
-        el('small', {}, 'SHA-256 ', el('code', {}, d.hashSha256), ' · ', d.integro ? 'integro' : 'NON INTEGRO'),
         el('br'),
         el('a', { class: 'scarica', href: `/api/documenti/${d.id}/pdf` }, 'Scarica PDF'),
         el('a', { class: 'scarica', href: `/api/documenti/${d.id}/json` }, 'Scarica JSON'),
@@ -600,12 +599,10 @@ async function mostraTraccia(inc, contenitore) {
         contenitore.replaceChildren(
             el('p', { class: 'dati' }, `Istantanea del ${data(t.istante)} · stato ${t.statoIncidente} · classificazione attiva ${t.classificazioneAttiva ? 'v' + t.classificazioneAttiva : '–'}`),
             el('table', {},
-                el('thead', {}, el('tr', {}, ['Id', 'Tipo', 'Versione', 'Stato', 'Classificazione', 'SHA-256', 'Integro'].map((h) => el('th', {}, h)))),
+                el('thead', {}, el('tr', {}, ['Id', 'Tipo', 'Versione', 'Stato', 'Classificazione'].map((h) => el('th', {}, h)))),
                 el('tbody', {}, t.documenti.map((d) => el('tr', {},
                     el('td', {}, d.id), el('td', {}, d.tipo), el('td', {}, d.versione), el('td', {}, d.stato),
-                    el('td', {}, d.versioneClassificazione ? `v${d.versioneClassificazione}` : '–'),
-                    el('td', {}, d.hashSha256 ? el('code', {}, d.hashSha256.slice(0, 16) + '…') : '–'),
-                    el('td', {}, d.integro === null ? '–' : String(d.integro)))))));
+                    el('td', {}, d.versioneClassificazione ? `v${d.versioneClassificazione}` : '–')))))));
     } catch (errore) {
         mostraErrore(contenitore, errore);
     }

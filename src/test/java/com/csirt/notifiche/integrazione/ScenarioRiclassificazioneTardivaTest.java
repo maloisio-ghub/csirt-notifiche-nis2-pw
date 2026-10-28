@@ -159,7 +159,7 @@ class ScenarioRiclassificazioneTardivaTest {
 
 
         assertEquals(prima.documenti(), dopo.documenti());
-        assertTrue(dopo.documenti().stream().allMatch(d -> d.versioneClassificazione() == 1 && d.integro()));
+        assertTrue(dopo.documenti().stream().allMatch(d -> d.versioneClassificazione() == 1));
         assertEquals(1, prima.classificazioneAttiva());
         assertEquals(2, dopo.classificazioneAttiva());
 
@@ -181,7 +181,6 @@ class ScenarioRiclassificazioneTardivaTest {
         assertEquals(2, cambiamento.versioneNuova());
         assertEquals(t("2026-10-21T11:00:00Z"), cambiamento.momento());
         assertEquals(MOTIVAZIONE, cambiamento.motivazione());
-        assertTrue(relazione.integro());
         assertEquals(StatoIncidente.CHIUSO, incidenti.trova(id).getStato());
         assertTrue(incidenti.scadenze(id).stream().allMatch(s -> s.stato() == StatoScadenza.RISPETTATA));
 
@@ -206,8 +205,8 @@ class ScenarioRiclassificazioneTardivaTest {
         }
         md.append(tabellaDocumenti("Prima della riclassificazione", prima));
         md.append(tabellaDocumenti("Dopo la riclassificazione", dopo));
-        md.append("\nVerifica: l'elenco dei documenti prima e dopo è identico (stessi id, versioni, stato, ")
-                .append("classificazione fissata e impronta).\n\n## Relazione finale\n\n");
+        md.append("\nVerifica: l'elenco dei documenti prima e dopo è identico (stessi id, versioni, stato ")
+                        .append("e classificazione fissata).\n\n## Relazione finale\n\n");
         for (Riclassificazione r : relazione.riclassificazioni()) {
             md.append("- **Classificazione precedente** (v").append(r.versionePrecedente()).append("): ")
                     .append(r.classificazionePrecedente()).append('\n')
@@ -218,9 +217,7 @@ class ScenarioRiclassificazioneTardivaTest {
         }
         md.append("\nRelazione finale (documento ").append(relazione.id()).append(", versione ")
                 .append(relazione.versione()).append(") trasmessa il ").append(ORA.format(relazione.dataTrasmissione()))
-                .append(" con classificazione v").append(relazione.versioneClassificazione())
-                .append("; impronta SHA-256 `").append(relazione.hashSha256()).append("`, integra: ")
-                .append(relazione.integro()).append(".\n");
+                .append(" con classificazione v").append(relazione.versioneClassificazione()).append(".\n");
         return md.toString();
     }
 
@@ -228,12 +225,12 @@ class ScenarioRiclassificazioneTardivaTest {
         StringBuilder md = new StringBuilder("\n## ").append(titolo).append(" (").append(ORA.format(traccia.istante()))
                 .append(")\n\nStato dell'incidente: ").append(traccia.statoIncidente())
                 .append(" – classificazione attiva: v").append(traccia.classificazioneAttiva()).append("\n\n")
-                .append("| Id | Tipo | Versione | Stato | Classificazione | SHA-256 (inizio) | Integro |\n")
-                .append("| --- | --- | --- | --- | --- | --- | --- |\n");
+                .append("| Id | Tipo | Versione | Stato | Classificazione |\n")
+                .append("| --- | --- | --- | --- | --- |\n");
         for (FotoDocumento d : traccia.documenti()) {
             md.append("| ").append(d.id()).append(" | ").append(d.tipo()).append(" | ").append(d.versione())
                     .append(" | ").append(d.stato()).append(" | v").append(d.versioneClassificazione())
-                    .append(" | `").append(d.hashSha256(), 0, 16).append("…` | ").append(d.integro()).append(" |\n");
+                    .append(" |\n");
         }
         return md.toString();
     }

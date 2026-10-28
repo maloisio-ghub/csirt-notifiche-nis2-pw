@@ -13,13 +13,9 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PostLoad;
-import jakarta.persistence.PostPersist;
-import jakarta.persistence.PostUpdate;
-import jakarta.persistence.PreRemove;
-import jakarta.persistence.PreUpdate;
+
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
+
 import jakarta.persistence.UniqueConstraint;
 
 /**
@@ -62,18 +58,12 @@ public class Documento {
     @Column(name = "data_trasmissione")
     private Instant dataTrasmissione;
 
-    /** Impronta SHA-256, calcolata alla trasmissione. */
-    @Column(name = "hash_sha256", length = 64)
-    private String hashSha256;
+
 
     /** Classificazione in vigore al momento della trasmissione: non cambia se l'incidente viene riclassificato. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classificazione_id")
     private Classificazione classificazione;
-
-    /** Vero se nel database il documento risulta già trasmesso. Non è una colonna. */
-    @Transient
-    private boolean trasmessoNelDatabase;
 
     protected Documento() {
         // richiesto da JPA
@@ -96,15 +86,15 @@ public class Documento {
         this.contenuto = nuovo.copia();
         this.dataUltimaModifica = adesso;
     }
-
-    /** Trasmissione: da qui in poi il documento è immutabile. */
-    public void trasmetti(Instant momento, Classificazione classificazioneInVigore, String impronta) {
+    public void trasmetti(Instant momento, Classificazione classificazioneInVigore) {
         verificaBozza();
         this.stato = StatoDocumento.TRASMESSO;
         this.dataTrasmissione = momento;
         this.classificazione = classificazioneInVigore;
-        this.hashSha256 = impronta;
     }
+
+    
+
 
     private void verificaBozza() {
         if (stato != StatoDocumento.BOZZA) {
@@ -113,23 +103,7 @@ public class Documento {
         }
     }
 
-    // linea di difesa: anche se qualcuno aggirasse i metodi sopra,
-    // Hibernate rifiuta di aggiornare o cancellare una riga già trasmessa.
 
-    @PostLoad
-    @PostPersist
-    @PostUpdate
-    void sincronizzaStatoDatabase() {
-        trasmessoNelDatabase = stato == StatoDocumento.TRASMESSO;
-    }
-
-    @PreUpdate
-    @PreRemove
-    void impedisciModificaTrasmesso() {
-        if (trasmessoNelDatabase) {
-            throw new IllegalStateException("Il documento " + id + " è trasmesso: non può essere modificato né cancellato");
-        }
-    }
 
     public boolean isBozza() {
         return stato == StatoDocumento.BOZZA;
@@ -151,7 +125,7 @@ public class Documento {
     public Instant getDataCreazione() { return dataCreazione; }
     public Instant getDataUltimaModifica() { return dataUltimaModifica; }
     public Instant getDataTrasmissione() { return dataTrasmissione; }
-    public String getHashSha256() { return hashSha256; }
+  
     public Classificazione getClassificazione() { return classificazione; }
     
 }

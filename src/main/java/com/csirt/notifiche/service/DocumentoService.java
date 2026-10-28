@@ -2,7 +2,6 @@ package com.csirt.notifiche.service;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 
@@ -83,7 +82,7 @@ public class DocumentoService {
         return dto(documento);
     }
 
-    /** Trasmissione al CSIRT: ordine, completezza, classificazione, impronta, chiusura. */
+    /** Trasmissione al CSIRT: ordine, completezza, classificazione, chiusura. */
     @Transactional
     public DocumentoDto trasmetti(Long documentoId) {
         Documento documento = trova(documentoId);
@@ -104,10 +103,7 @@ public class DocumentoService {
             throw new DocumentoIncompletoException(documento.getTipo(), mancanti);
         }
 
-        List<Riclassificazione> riclassificazioni = riclassificazioniDopoLaNotifica(documento, classificazione);
-        Instant adesso = Instant.now(clock).truncatedTo(ChronoUnit.MICROS);
-        documento.trasmetti(adesso, classificazione, RegoleDocumento.sha256(
-                RegoleDocumento.testoCanonico(documento, adesso, classificazione, riclassificazioni)));
+        documento.trasmetti(Instant.now(clock), classificazione);
 
         if (documento.getTipo() == TipoDocumento.RELAZIONE_FINALE) {
             incidente.chiudi();

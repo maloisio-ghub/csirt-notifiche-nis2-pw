@@ -134,7 +134,6 @@ erDiagram
         timestamp data_creazione
         timestamp data_ultima_modifica
         timestamp data_trasmissione
-        varchar hash_sha256
         bigint classificazione_id FK
     }
 ```
@@ -318,5 +317,4 @@ incorporato nella stessa tabella.
 | `data_creazione` | timestamp with time zone | not null | Creazione della bozza |
 | `data_ultima_modifica` | timestamp with time zone | not null | Ultimo salvataggio |
 | `data_trasmissione` | timestamp with time zone | | Momento della trasmissione (null in bozza) |
-| `hash_sha256` | varchar(64) | | Impronta del testo canonico calcolata alla trasmissione |
 | `classificazione_id` | bigint | FK | Classificazione in vigore alla trasmissione (null in bozza) |
