@@ -10,8 +10,8 @@ a ogni valutazione. Sono implementate in `MotoreSignificativita` (package `signi
   regole scattate, ciascuna con il riferimento all'articolo e i valori che l'hanno attivata.
 - **Confronto stretto.** Il Regolamento usa sempre la formula "più di": un valore esattamente pari alla soglia non
   rende l'incidente significativo.
-- **Soglie come dati.** Fatturato, quote e durate sono salvati nella tabella `parametri_significativita` con un
-  numero di versione; ogni valutazione registra la versione usata e una copia della base utenti del servizio.
+  - **Soglie come dati.** Fatturato, quote e durate sono salvati nella tabella `parametri_significativita` (caricata
+    da `data.sql`) e non scritti nel codice: per aggiornarli basta modificare il dato.
 - **Criteri generali e per servizio.** R1–R5 si valutano una volta per incidente; R7–R10 si valutano per ciascun
   servizio critico coinvolto, con la soglia utenti di quel servizio.
 
@@ -38,7 +38,7 @@ arrotondato per difetto perché gli utenti sono numeri interi.
 
 ```mermaid
 flowchart TD
-    A["Dati della valutazione:<br/>perdita, criteri qualitativi,<br/>impatti sui servizi"] --> B["Parametri in vigore<br/>(versione più recente)"]
+    A["Dati della valutazione:<br/>perdita, criteri qualitativi,<br/>impatti sui servizi"] --> B["Parametri di significatività<br/>(dal database)"]
     B --> C{"Criteri generali<br/>art. 3"}
     C --> R1["R1 perdita > 500.000 €"]
     C --> R25["R2–R5 criteri qualitativi<br/>dichiarati dall'operatore"]

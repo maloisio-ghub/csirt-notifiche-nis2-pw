@@ -50,8 +50,7 @@ class SignificativitaServiceTest {
 
         assertTrue(valutazione.significativo());
         assertEquals(List.of("R7"), valutazione.regole());
-        assertEquals(1, valutazione.versioneParametri());
-        assertEquals(12_000, valutazione.impatti().get(0).baseUtenti());
+        assertEquals("S1", valutazione.impatti().get(0).getCodiceServizio());
         Incidente incidente = incidenti.trova(id);
         assertEquals(StatoIncidente.SIGNIFICATIVO, incidente.getStato());
         assertEquals(valutazione.dataValutazione(), incidente.getDataConoscenza());

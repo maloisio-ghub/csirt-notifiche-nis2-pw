@@ -24,7 +24,7 @@ public class ConfigurazioneService {
 
     @Transactional(readOnly = true)
     public ParametriSignificativita parametriInVigore() {
-        return parametri.findTopByOrderByVersioneDesc()
+                return parametri.findAll().stream().findFirst()
                 .orElseThrow(() -> new IllegalStateException("Nessun parametro di significatività configurato"));
     }
 

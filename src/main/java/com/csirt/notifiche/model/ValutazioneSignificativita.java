@@ -22,7 +22,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
-/** Una valutazione di significatività: dati in ingresso, parametri usati ed esito. Non si modifica. */
+/** Una valutazione di significatività: dati in ingresso ed esito. Non si modifica. */
 @Entity
 @Table(name = "valutazione_significativita")
 public class ValutazioneSignificativita {
@@ -34,10 +34,6 @@ public class ValutazioneSignificativita {
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "incidente_id", nullable = false)
     private Incidente incidente;
-
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "parametri_id", nullable = false)
-    private ParametriSignificativita parametri;
 
     @Column(name = "data_valutazione", nullable = false)
     private Instant dataValutazione;
@@ -77,10 +73,9 @@ public class ValutazioneSignificativita {
         // richiesto da JPA
     }
 
-    public ValutazioneSignificativita(Incidente incidente, ParametriSignificativita parametri, Instant momento,
-                                      DatiValutazione dati, EsitoValutazione esito) {
+      public ValutazioneSignificativita(Incidente incidente, Instant momento,
+                                        DatiValutazione dati, EsitoValutazione esito) {
         this.incidente = incidente;
-        this.parametri = parametri;
         this.dataValutazione = momento;
         this.perditaEconomica = dati.perditaEconomica();
         this.esfiltrazioneSegretiCommerciali = dati.esfiltrazioneSegretiCommerciali();
@@ -105,7 +100,6 @@ public class ValutazioneSignificativita {
 
     public Long getId() { return id; }
     public Incidente getIncidente() { return incidente; }
-    public ParametriSignificativita getParametri() { return parametri; }
     public Instant getDataValutazione() { return dataValutazione; }
     public BigDecimal getPerditaEconomica() { return perditaEconomica; }
     public List<ImpattoValutato> getImpatti() { return impatti; }

@@ -1,13 +1,10 @@
 package com.csirt.notifiche.dto;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import com.csirt.notifiche.model.ParametriSignificativita;
 
 public record ParametriDto(
-        int versione,
-        LocalDate validoDal,
         BigDecimal fatturatoAnnuo,
         BigDecimal sogliaPerdita,
         int minutiIndisponibilitaTotale,
@@ -17,8 +14,8 @@ public record ParametriDto(
         String nota) {
 
     public static ParametriDto da(ParametriSignificativita p) {
-        return new ParametriDto(p.getVersione(), p.getValidoDal(), p.getFatturatoAnnuo(),
-                p.comeSoglia().sogliaPerdita(), p.getMinutiIndisponibilitaTotale(),
-                p.getMinutiDisponibilitaLimitata(), p.getQuotaUtenti(), p.getUtentiMassimi(), p.getNota());
+        return new ParametriDto(p.getFatturatoAnnuo(), p.comeSoglia().sogliaPerdita(),
+                p.getMinutiIndisponibilitaTotale(), p.getMinutiDisponibilitaLimitata(),
+                p.getQuotaUtenti(), p.getUtentiMassimi(), p.getNota());
     }
 }

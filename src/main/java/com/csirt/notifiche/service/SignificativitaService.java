@@ -70,7 +70,7 @@ public class SignificativitaService {
         }
 
         ValutazioneSignificativita valutazione =
-                valutazioni.save(new ValutazioneSignificativita(incidente, parametri, adesso, dati, esito));
+                                valutazioni.save(new ValutazioneSignificativita(incidente, adesso, dati, esito));
         return ValutazioneDto.da(valutazione);
     }
 

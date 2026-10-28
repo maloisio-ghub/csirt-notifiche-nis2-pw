@@ -1,7 +1,6 @@
 package com.csirt.notifiche.model;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 
 import com.csirt.notifiche.significativita.ParametriSoglia;
 
@@ -12,7 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-/** Soglie di significatività versionate. */
+/** Soglie di significatività, lette dal database. */
 @Entity
 @Table(name = "parametri_significativita")
 public class ParametriSignificativita {
@@ -20,12 +19,6 @@ public class ParametriSignificativita {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @Column(name = "versione", nullable = false, unique = true)
-    private int versione;
-
-    @Column(name = "valido_dal", nullable = false)
-    private LocalDate validoDal;
 
     @Column(name = "fatturato_annuo", nullable = false, precision = 15, scale = 2)
     private BigDecimal fatturatoAnnuo;
@@ -63,8 +56,6 @@ public class ParametriSignificativita {
     }
 
     public Long getId() { return id; }
-    public int getVersione() { return versione; }
-    public LocalDate getValidoDal() { return validoDal; }
     public BigDecimal getFatturatoAnnuo() { return fatturatoAnnuo; }
     public BigDecimal getPerditaMassima() { return perditaMassima; }
     public BigDecimal getQuotaFatturato() { return quotaFatturato; }

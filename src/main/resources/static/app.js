@@ -261,7 +261,7 @@ function sezioneValutazione(inc, valutazioni) {
 function esitoValutazione(v) {
     return el('div', { class: `esito ${v.significativo ? 'positivo' : 'negativo'}` },
         el('strong', {}, v.significativo ? 'SIGNIFICATIVO' : 'Non significativo'),
-        ` · ${data(v.dataValutazione)} · parametri v${v.versioneParametri}`,
+        ` · ${data(v.dataValutazione)}`,
         v.motivazioni.length
             ? el('ul', {}, v.motivazioni.map((m) => el('li', {}, m)))
             : el('p', { class: 'nota' }, 'Nessuna regola soddisfatta.'));

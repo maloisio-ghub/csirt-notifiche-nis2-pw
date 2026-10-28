@@ -10,7 +10,6 @@ esporta il DDL reale in `target/schema.sql`, copiato in [`schema.sql`](schema.sq
 ```mermaid
 erDiagram
     incidente ||--o{ valutazione_significativita : "valutato in"
-    parametri_significativita ||--o{ valutazione_significativita : "applicati in"
     valutazione_significativita ||--|{ valutazione_impatto : "contiene"
     incidente ||--o{ classificazione : "classificato in"
     versione_tassonomia ||--o{ classificazione : "valori da"
@@ -39,8 +38,6 @@ erDiagram
     }
     parametri_significativita {
         bigint id PK
-        int versione UK
-        date valido_dal
         numeric fatturato_annuo
         numeric perdita_massima
         numeric quota_fatturato
@@ -53,7 +50,6 @@ erDiagram
     valutazione_significativita {
         bigint id PK
         bigint incidente_id FK
-        bigint parametri_id FK
         timestamp data_valutazione
         numeric perdita_economica
         boolean esfiltrazione_segreti
@@ -68,7 +64,6 @@ erDiagram
         bigint valutazione_id PK, FK
         int posizione PK
         varchar codice_servizio
-        bigint base_utenti
         int minuti_indisponibilita_totale
         int minuti_disponibilita_limitata
         bigint utenti_disponibilita_limitata
@@ -148,7 +143,6 @@ fotografia dei dati usati anche se in futuro la base utenti cambia.
 | `uk_classificazione_versione` (incidente_id, versione) | classificazione | Versioni della classificazione numerate senza duplicati |
 | `uk_voce_versione_codice` (versione_id, codice) | voce_tassonomia | Un codice TC-ACN compare una sola volta per versione |
 | `codice` unico | servizio_critico, versione_tassonomia | Codici di riferimento univoci |
-| `versione` unica | parametri_significativita | Una sola riga per versione dei parametri |
 
 ## Data dictionary
 
@@ -185,8 +179,6 @@ Soglie versionate del Reg. (UE) 2024/2690 applicate al contesto.
 | Colonna | Tipo | Vincoli | Descrizione |
 | --- | --- | --- | --- |
 | `id` | bigint identity | PK | Identificativo |
-| `versione` | integer | not null, unique | Versione; è in vigore la più alta |
-| `valido_dal` | date | not null | Data di validità |
 | `fatturato_annuo` | numeric(15,2) | not null | Fatturato dell'ultimo esercizio chiuso |
 | `perdita_massima` | numeric(15,2) | not null | Limite assoluto della perdita (500.000 €) |
 | `quota_fatturato` | numeric(5,4) | not null | Quota del fatturato (0,05) |
@@ -198,13 +190,12 @@ Soglie versionate del Reg. (UE) 2024/2690 applicate al contesto.
 
 ### `valutazione_significativita`
 
-Ogni valutazione eseguita: dati in ingresso, versione dei parametri ed esito.
+Ogni valutazione eseguita: dati in ingresso ed esito.
 
 | Colonna | Tipo | Vincoli | Descrizione |
 | --- | --- | --- | --- |
 | `id` | bigint identity | PK | Identificativo |
 | `incidente_id` | bigint | not null, FK | Incidente valutato |
-| `parametri_id` | bigint | not null, FK | Versione dei parametri applicata |
 | `data_valutazione` | timestamp with time zone | not null | Momento della valutazione |
 | `perdita_economica` | numeric(15,2) | not null | Perdita stimata dichiarata |
 | `esfiltrazione_segreti` | boolean | not null | Criterio art. 3.1.b |
@@ -224,7 +215,6 @@ Impatti sui servizi critici al momento della valutazione (collezione incorporata
 | `valutazione_id` | bigint | PK, FK | Valutazione di appartenenza |
 | `posizione` | integer | PK | Ordine dell'impatto nella valutazione |
 | `codice_servizio` | varchar(10) | not null | Servizio impattato |
-| `base_utenti` | bigint | not null | Base utenti copiata al momento della valutazione |
 | `minuti_indisponibilita_totale` | integer | not null | Durata dell'indisponibilità totale |
 | `minuti_disponibilita_limitata` | integer | not null | Durata della disponibilità limitata |
 | `utenti_disponibilita_limitata` | bigint | not null | Utenti con disponibilità limitata |

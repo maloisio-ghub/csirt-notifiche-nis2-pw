@@ -12,9 +12,6 @@ public class ImpattoValutato {
     @Column(name = "codice_servizio", nullable = false, length = 10)
     private String codiceServizio;
 
-    @Column(name = "base_utenti", nullable = false)
-    private long baseUtenti;
-
     @Column(name = "minuti_indisponibilita_totale", nullable = false)
     private int minutiIndisponibilitaTotale;
 
@@ -34,9 +31,8 @@ public class ImpattoValutato {
         // richiesto da JPA
     }
 
-    public ImpattoValutato(ImpattoServizio i) {
+     public ImpattoValutato(ImpattoServizio i) {
         this.codiceServizio = i.codiceServizio();
-        this.baseUtenti = i.baseUtenti();
         this.minutiIndisponibilitaTotale = i.minutiIndisponibilitaTotale();
         this.minutiDisponibilitaLimitata = i.minutiDisponibilitaLimitata();
         this.utentiDisponibilitaLimitata = i.utentiDisponibilitaLimitata();
@@ -44,8 +40,10 @@ public class ImpattoValutato {
         this.utentiCompromissione = i.utentiCompromissione();
     }
 
-    public ImpattoServizio comeImpatto() {
-        return new ImpattoServizio(codiceServizio, baseUtenti, minutiIndisponibilitaTotale,
-                minutiDisponibilitaLimitata, utentiDisponibilitaLimitata, compromissioneMalevola, utentiCompromissione);
-    }
+    public String getCodiceServizio() { return codiceServizio; }
+    public int getMinutiIndisponibilitaTotale() { return minutiIndisponibilitaTotale; }
+    public int getMinutiDisponibilitaLimitata() { return minutiDisponibilitaLimitata; }
+    public long getUtentiDisponibilitaLimitata() { return utentiDisponibilitaLimitata; }
+    public boolean isCompromissioneMalevola() { return compromissioneMalevola; }
+    public long getUtentiCompromissione() { return utentiCompromissione; }
 }
