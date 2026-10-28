@@ -26,11 +26,11 @@ Tabella delle regole, soglie e diagramma del flusso di valutazione: [docs/regole
 
 ## Funzionalità
 
-- Registrazione degli incidenti e **valutazione di significatività** con regole e soglie versionate.
+- Registrazione degli incidenti e **valutazione di significatività** con le regole R1–R10 e soglie lette dal database.
 - **Scadenze** di pre-notifica (24 h), notifica (72 h) e relazione finale (un mese dalla notifica), con esito.
 - **Classificazione** con la TC-ACN 2.0 caricata come dati versionati; **riclassificazione** motivata.
 - **Tre adempimenti** con salvataggio in bozza, riuso dei dati, validazione differenziata (422 con i campi
-  mancanti), ordine vincolato, trasmissione con **impronta SHA-256** e documenti trasmessi **immutabili**.
+  mancanti), ordine vincolato e documenti trasmessi **immutabili**.
 - Relazione finale con le **riclassificazioni successive alla notifica**.
 - Export in **PDF** (stampabile) e **JSON** (strutturato); **traccia di esecuzione**.
 - **Interfaccia web** guidata servita dalla stessa applicazione.
@@ -68,7 +68,7 @@ Lo scenario completo è percorribile dall'interfaccia senza accedere a sistemi o
 5. riclassificare con motivazione dopo la notifica;
 6. creare e trasmettere la relazione finale, che riporta la riclassificazione; scaricare PDF e JSON.
 
-Lo stesso scenario, con orologio simulato, è automatizzato dal test `ScenarioRiclassificazioneTardivaTest`,
+Lo stesso scenario è automatizzato dal test `ScenarioRiclassificazioneTardivaTest`,
 che produce [la traccia di esecuzione](docs/traccia-riclassificazione.md). Le schermate dello scenario
 completato sono in `docs/screenshot/`.
 
@@ -87,20 +87,11 @@ completato sono in `docs/screenshot/`.
 | `docs/` | Documentazione (vedi sotto) |
 | `Dockerfile` | Immagine per il deploy |
 
-## Corrispondenza con la traccia
-
-| Elaborato richiesto | Dove si trova |
-| --- | --- |
-| 1. Backend REST a livelli, interfaccia con bozze e riuso, build e istruzioni | Package `controller`/`service`/`repository`; `static/`; questo README |
-| 2. Tassonomia vigente con data di acquisizione, caricamento a dati, discrepanze, conteggi | [docs/tassonomia-acn.md](docs/tassonomia-acn.md), `docs/fonti/`, `src/main/resources/tassonomia/` |
-| 3. Riclassificazione tardiva, documenti immutati, traccia di esecuzione | [docs/traccia-riclassificazione.md](docs/traccia-riclassificazione.md), `ScenarioRiclassificazioneTardivaTest` |
-| 4. Matrice generata dal codice, test di rifiuto, scenari di soglia | [docs/matrice-campi.md](docs/matrice-campi.md), `TrasmissioneDocumentiTest`; [docs/regole-significativita.md](docs/regole-significativita.md), `MotoreSignificativitaTest` |
-| 5. Architettura, ER e data dictionary coerenti con il DDL, scenario simulato | [docs/architettura.md](docs/architettura.md), [docs/modello-dati.md](docs/modello-dati.md), [docs/schema.sql](docs/schema.sql), `ModelloDatiDocumentatoTest`; percorso dimostrativo, `ScenarioRiclassificazioneTardivaTest`, `docs/screenshot/` |
 
 ## Documentazione
 
 - [Architettura](docs/architettura.md): componenti, livelli, flusso principale, sicurezza
-- [Modello dati](docs/modello-dati.md): diagramma ER e data dictionary, verificati automaticamente contro lo schema reale
+- [Modello dati](docs/modello-dati.md): diagramma ER e data dictionary, coerenti con lo schema del database
 - [Schema del database](docs/schema.sql): DDL effettivo esportato dal database
 - [Regole di significatività](docs/regole-significativita.md): regole R1–R10, soglie e diagramma del flusso di valutazione
 - [Tassonomia ACN](docs/tassonomia-acn.md): fonte, caricamento, conteggi, discrepanze
@@ -142,7 +133,7 @@ L'applicazione è pubblicata su Render: <https://csirt-notifiche-nis2-pw-maloisi
 
 **Immagine Docker.** Il `Dockerfile` è multi-stage: il primo stadio (`maven:3.9-eclipse-temurin-25`) scarica le
 dipendenze e produce il JAR; il secondo (`eclipse-temurin:25-jre`) contiene solo il JRE e il JAR e avvia
-l'applicazione con un utente senza privilegi, limitando la memoria usata da Java. Prova locale:
+l'applicazione limitando la memoria usata da Java. Prova locale:
 
 ```bash
 docker build -t notifiche-nis2 .

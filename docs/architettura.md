@@ -1,8 +1,8 @@
 # Architettura
 
-L'applicazione è un **monolite Spring Boot a livelli**: un unico JAR contiene interfaccia web, API REST,
+L'applicazione è stata realizzata con **Spring Boot a livelli**: un unico JAR contiene interfaccia web, API REST,
 logica applicativa e persistenza. Le regole di dominio (significatività, scadenze, matrice dei campi,
-tassonomia) sono scritte in Java puro, senza dipendenze da Spring o dal database, e testate in isolamento.
+tassonomia) sono scritte in Java, senza dipendenze da Spring o dal database, e testate in isolamento.
 
 ## Diagramma dei componenti
 
@@ -91,7 +91,7 @@ sequenceDiagram
     UI->>API: POST /api/incidenti
     Op->>UI: indica gli impatti
     UI->>API: POST /api/incidenti/{id}/valutazioni
-    API->>Dom: MotoreSignificativita (parametri v1)
+    API->>Dom: MotoreSignificativita (soglie dal database)
     Dom-->>API: significativo, R7 [S1]
     API->>DB: stato SIGNIFICATIVO, momento di conoscenza
     Op->>UI: seleziona i valori TC-ACN
@@ -104,7 +104,7 @@ sequenceDiagram
         alt documento incompleto
             API-->>UI: 422 + campi mancanti
         else completo
-            API->>DB: TRASMESSO, classificazione fissata, impronta SHA-256
+            API->>DB: TRASMESSO, classificazione fissata
         end
     end
     Op->>UI: riclassifica dopo la notifica (con motivazione)
@@ -117,12 +117,15 @@ sequenceDiagram
 | Aspetto | Stato | Motivazione |
 | --- | --- | --- |
 | Validazione dell'input | Lato server su ogni DTO (Bean Validation) e nelle regole dei servizi | Il client non è affidabile |
-| Integrità dei documenti | Impronta SHA-256 calcolata alla trasmissione e verificabile (`integro`) | Dimostra che quanto inviato al CSIRT non è cambiato |
-| Immutabilità | Metodi dell'entità e callback JPA `@PreUpdate`/`@PreRemove` | Doppio controllo sui documenti trasmessi |
+| Immutabilità dei documenti | L'entità `Documento` accetta modifiche solo in bozza; dopo la trasmissione l'API risponde 409 | Quanto inviato al CSIRT non cambia |
 | Interfaccia web | Testi inseriti nel DOM sempre come testo, mai come HTML | Protezione dal cross-site scripting (XSS) |
 | Console H2 | Non inclusa | Evita l'esposizione del database in rete |
 | CORS | Nessuna apertura | Interfaccia e API sono servite dalla stessa origine |
 | Autenticazione e ruoli | Assenti | Fuori perimetro del prototipo: vedi i limiti del prototipo nel [README](../README.md) |
+
+## Decisioni progettuali
+
+Le scelte principali e le alternative scartate sono descritte nel [registro delle decisioni](decisioni.md).
 
 ## Deploy
 
