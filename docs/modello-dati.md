@@ -1,9 +1,8 @@
 # Modello dati
 
-Lo schema è generato da Hibernate a partire dalle entità JPA. Diagramma ER e data dictionary qui sotto sono
-**verificati automaticamente** dal test `ModelloDatiDocumentatoTest`, che legge le tabelle e le colonne
-effettive del database (`INFORMATION_SCHEMA`) e fallisce se questo documento non coincide. Lo stesso test
-esporta il DDL reale in `target/schema.sql`, copiato in [`schema.sql`](schema.sql).
+Lo schema è generato da Hibernate a partire dalle entità JPA. Il DDL effettivo, esportato dal database H2
+con il comando `SCRIPT NODATA`, è in [`schema.sql`](schema.sql). Diagramma ER e data dictionary qui sotto
+riportano le stesse tabelle e colonne del DDL.
 
 ## Diagramma ER
 
