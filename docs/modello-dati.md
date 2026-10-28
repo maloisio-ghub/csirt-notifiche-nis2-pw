@@ -13,7 +13,6 @@ erDiagram
     parametri_significativita ||--o{ valutazione_significativita : "applicati in"
     valutazione_significativita ||--|{ valutazione_impatto : "contiene"
     incidente ||--o{ classificazione : "classificato in"
-    classificazione |o--o| classificazione : "precedente"
     versione_tassonomia ||--o{ classificazione : "valori da"
     classificazione ||--|{ classificazione_valore : "assegna"
     voce_tassonomia ||--o{ classificazione_valore : "assegnata in"
@@ -107,7 +106,6 @@ erDiagram
         bigint versione_tassonomia_id FK
         timestamp data_classificazione
         varchar motivazione
-        bigint precedente_id FK
         boolean attiva
     }
     classificazione_valore {
@@ -279,7 +277,6 @@ Versioni della classificazione TC-ACN di un incidente.
 | `versione_tassonomia_id` | bigint | not null, FK | Versione della TC-ACN da cui provengono i valori |
 | `data_classificazione` | timestamp with time zone | not null | Momento della classificazione o riclassificazione |
 | `motivazione` | varchar(2000) | | Motivazione del cambiamento (obbligatoria dalla versione 2) |
-| `precedente_id` | bigint | FK | Versione precedente (null per la versione 1) |
 | `attiva` | boolean | not null | Vero solo per l'ultima versione |
 
 ### `classificazione_valore`

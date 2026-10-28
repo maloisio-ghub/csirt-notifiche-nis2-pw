@@ -19,8 +19,8 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 /**
- * Classificazione TC-ACN di un incidente. Ogni cambiamento è una nuova versione collegata alla
- * precedente, con momento e motivazione.
+ * Classificazione TC-ACN di un incidente. Ogni cambiamento è una nuova versione numerata,
+ * con momento e motivazione; le versioni precedenti restano consultabili.
  */
 @Entity
 @Table(name = "classificazione", uniqueConstraints = @UniqueConstraint(
@@ -56,10 +56,6 @@ public class Classificazione {
     @Column(name = "motivazione", length = 2000)
     private String motivazione;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "precedente_id")
-    private Classificazione precedente;
-
     /** Una sola classificazione attiva per incidente: l'ultima. */
     @Column(name = "attiva", nullable = false)
     private boolean attiva;
@@ -69,21 +65,19 @@ public class Classificazione {
     }
 
     private Classificazione(Incidente incidente, int versione, VersioneTassonomia versioneTassonomia,
-                            Set<VoceTassonomia> valori, Instant momento, String motivazione,
-                            Classificazione precedente) {
+                            Set<VoceTassonomia> valori, Instant momento, String motivazione) {
         this.incidente = incidente;
         this.versione = versione;
         this.versioneTassonomia = versioneTassonomia;
         this.valori = new HashSet<>(valori);
         this.dataClassificazione = momento;
         this.motivazione = motivazione;
-        this.precedente = precedente;
         this.attiva = true;
     }
 
     public static Classificazione iniziale(Incidente incidente, VersioneTassonomia versioneTassonomia,
                                            Set<VoceTassonomia> valori, Instant momento) {
-        return new Classificazione(incidente, 1, versioneTassonomia, valori, momento, null, null);
+    return new Classificazione(incidente, 1, versioneTassonomia, valori, momento, null);
     }
 
     /** Crea la versione successiva e disattiva questa. */
@@ -100,10 +94,10 @@ public class Classificazione {
         }
         this.attiva = false;
         return new Classificazione(incidente, versione + 1, versioneTassonomia, nuoviValori, momento,
-                motivazione.trim(), this);
+                motivazione.trim());
     }
 
-    /** Codici ordinati, separati da virgola: forma stabile per confronti e impronte. */
+    /** Codici ordinati, separati da virgola: forma stabile per i confronti. */
     public String codiciOrdinati() {
         return codici(valori);
     }
@@ -119,6 +113,5 @@ public class Classificazione {
     public Set<VoceTassonomia> getValori() { return valori; }
     public Instant getDataClassificazione() { return dataClassificazione; }
     public String getMotivazione() { return motivazione; }
-    public Classificazione getPrecedente() { return precedente; }
     public boolean isAttiva() { return attiva; }
 }

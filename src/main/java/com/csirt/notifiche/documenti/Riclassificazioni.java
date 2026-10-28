@@ -1,12 +1,12 @@
 package com.csirt.notifiche.documenti;
 
 import java.time.Instant;
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.csirt.notifiche.model.Classificazione;
 
-/** Ricostruisce i cambi di classificazione tra due versioni, seguendo la catena delle precedenti. */
+/** Ricostruisce i cambi di classificazione tra due versioni, confrontando ogni versione con quella prima. */
 public final class Riclassificazioni {
 
     public record Riclassificazione(int versionePrecedente, String classificazionePrecedente, int versioneNuova,
@@ -17,25 +17,24 @@ public final class Riclassificazioni {
     }
 
     /**
-     * Cambiamenti da {@code riferimento} (esclusa) a {@code finale} (inclusa), in ordine cronologico.
-     * Lista vuota se manca una delle due o se il riferimento non è nella catena di {@code finale}.
+     * Cambiamenti successivi a {@code riferimento} e fino a {@code finale} (inclusa), in ordine cronologico.
+     * {@code storico} contiene tutte le classificazioni dell'incidente, ordinate per versione.
      */
-    public static List<Riclassificazione> tra(Classificazione riferimento, Classificazione finale) {
+    public static List<Riclassificazione> tra(List<Classificazione> storico, Classificazione riferimento,
+                                              Classificazione finale) {
         if (riferimento == null || finale == null) {
             return List.of();
         }
-        LinkedList<Riclassificazione> passi = new LinkedList<>();
-        Classificazione corrente = finale;
-        while (!corrente.getId().equals(riferimento.getId())) {
-            Classificazione precedente = corrente.getPrecedente();
-            if (precedente == null) {
-                return List.of();
+        List<Riclassificazione> passi = new ArrayList<>();
+        for (int i = 1; i < storico.size(); i++) {
+            Classificazione precedente = storico.get(i - 1);
+            Classificazione corrente = storico.get(i);
+            if (corrente.getVersione() > riferimento.getVersione() && corrente.getVersione() <= finale.getVersione()) {
+                passi.add(new Riclassificazione(precedente.getVersione(), precedente.codiciOrdinati(),
+                        corrente.getVersione(), corrente.codiciOrdinati(), corrente.getDataClassificazione(),
+                        corrente.getMotivazione()));
             }
-            passi.addFirst(new Riclassificazione(precedente.getVersione(), precedente.codiciOrdinati(),
-                    corrente.getVersione(), corrente.codiciOrdinati(), corrente.getDataClassificazione(),
-                    corrente.getMotivazione()));
-            corrente = precedente;
         }
-        return List.copyOf(passi);
+        return passi;
     }
 }

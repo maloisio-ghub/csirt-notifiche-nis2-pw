@@ -24,6 +24,6 @@ public record ClassificazioneDto(
                 .toList();
         return new ClassificazioneDto(c.getId(), c.getVersione(), c.getVersioneTassonomia().getCodice(), valori,
                 c.getDataClassificazione(), c.getMotivazione(),
-                c.getPrecedente() == null ? null : c.getPrecedente().getVersione(), c.isAttiva());
+                c.getVersione() > 1 ? c.getVersione() - 1 : null, c.isAttiva());
     }
 }

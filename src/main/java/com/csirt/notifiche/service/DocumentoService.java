@@ -135,7 +135,7 @@ public class DocumentoService {
         return documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream().map(this::dto).toList();
     }
 
-    /** Traccia di esecuzione: classificazioni e documenti con id, versione, stato e impronta. */
+    /** Traccia di esecuzione: classificazioni e documenti con id, versione e stato. */
     @Transactional(readOnly = true)
     public TracciaDto traccia(Long incidenteId) {
         Incidente incidente = incidenteService.trova(incidenteId);
@@ -164,7 +164,9 @@ public class DocumentoService {
                         documento.getIncidente().getId(), TipoDocumento.NOTIFICA, StatoDocumento.TRASMESSO)
                 .map(Documento::getClassificazione)
                 .orElse(null);
-        return Riclassificazioni.tra(allaNotifica, finale);
+        return Riclassificazioni.tra(
+                classificazioni.findByIncidenteIdOrderByVersioneAsc(documento.getIncidente().getId()),
+                allaNotifica, finale);
     }
 
     private void verificaOrdine(Documento documento) {
