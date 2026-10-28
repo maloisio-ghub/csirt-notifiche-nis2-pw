@@ -479,7 +479,6 @@ function riepilogoTrasmesso(d) {
         distintivo('TRASMESSO'), ` v${d.versione} · ${data(d.dataTrasmissione)}`,
         d.versioneClassificazione ? ` · classificazione v${d.versioneClassificazione}` : '',
         el('br'),
-        el('br'),
         el('a', { class: 'scarica', href: `/api/documenti/${d.id}/pdf` }, 'Scarica PDF'),
         el('a', { class: 'scarica', href: `/api/documenti/${d.id}/json` }, 'Scarica JSON'),
         d.riclassificazioni && d.riclassificazioni.length ? boxRiclassificazioni(d.riclassificazioni) : null);
@@ -588,7 +587,7 @@ function sezioneTraccia(inc) {
     const contenitore = el('div');
     return el('section', { class: 'pannello' },
         el('h3', {}, 'Traccia di esecuzione'),
-        el('p', { class: 'nota' }, 'Stato attuale di classificazioni e documenti, con versioni e impronte.'),
+        el('p', { class: 'nota' }, 'Stato attuale di classificazioni e documenti, con versioni e stato.'),
         el('div', { class: 'pulsanti' }, el('button', { class: 'secondario', onclick: () => mostraTraccia(inc, contenitore) }, 'Mostra traccia')),
         contenitore);
 }
@@ -602,7 +601,7 @@ async function mostraTraccia(inc, contenitore) {
                 el('thead', {}, el('tr', {}, ['Id', 'Tipo', 'Versione', 'Stato', 'Classificazione'].map((h) => el('th', {}, h)))),
                 el('tbody', {}, t.documenti.map((d) => el('tr', {},
                     el('td', {}, d.id), el('td', {}, d.tipo), el('td', {}, d.versione), el('td', {}, d.stato),
-                    el('td', {}, d.versioneClassificazione ? `v${d.versioneClassificazione}` : '–')))))));
+                    el('td', {}, d.versioneClassificazione ? `v${d.versioneClassificazione}` : '–'))))));
     } catch (errore) {
         mostraErrore(contenitore, errore);
     }
