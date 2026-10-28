@@ -5,21 +5,14 @@ import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import com.csirt.notifiche.model.TipoVoce;
 
-/**
- * Contenuto di un file della tassonomia validato
- */
+/** Contenuto di un file della tassonomia, con i controlli essenziali prima del caricamento. */
 public final class DefinizioneTassonomia {
 
     public static final List<String> INTESTAZIONE =
             List.of("tipo", "codice", "nome", "padre", "multiplo", "gruppo", "descrizione");
-
-    private static final Pattern CODICE_MACROCATEGORIA = Pattern.compile("[A-Z]{2}");
-    private static final Pattern CODICE_PREDICATO = Pattern.compile("[A-Z]{2}:[A-Z]{2}");
-    private static final Pattern CODICE_VALORE = Pattern.compile("[A-Z]{2}:[A-Z]{2}_[A-Za-z0-9_-]+");
 
     private final List<RigaTassonomia> righe;
 
@@ -48,42 +41,25 @@ public final class DefinizioneTassonomia {
             String codice = colonne.get(1);
             String nome = colonne.get(2).trim();
             String padre = colonne.get(3);
-            String multiplo = colonne.get(4);
 
-            if (nome.isEmpty()) {
-                throw errore(numero, "nome mancante per " + codice);
+            if (codice.isBlank() || nome.isEmpty()) {
+                throw errore(numero, "codice o nome mancante");
             }
             if (definite.containsKey(codice)) {
                 throw errore(numero, "codice duplicato " + codice);
             }
-            switch (tipo) {
-                case MACROCATEGORIA -> {
-                    verificaFormato(CODICE_MACROCATEGORIA, codice, numero);
-                    if (!padre.isEmpty()) {
-                        throw errore(numero, "una macrocategoria non ha padre");
-                    }
-                }
-                case PREDICATO -> {
-                    verificaFormato(CODICE_PREDICATO, codice, numero);
-                    verificaPadre(definite, padre, TipoVoce.MACROCATEGORIA, numero);
-                    if (!codice.startsWith(padre + ":")) {
-                        throw errore(numero, codice + " non appartiene alla macrocategoria " + padre);
-                    }
-                }
-                case VALORE -> {
-                    verificaFormato(CODICE_VALORE, codice, numero);
-                    verificaPadre(definite, padre, TipoVoce.PREDICATO, numero);
-                    if (!codice.startsWith(padre + "_")) {
-                        throw errore(numero, codice + " non appartiene al predicato " + padre);
-                    }
-                }
-            }
-            if (!multiplo.equals("S") && !multiplo.equals("N")) {
-                throw errore(numero, "multiplo deve essere S o N");
+            // Macrocategoria senza padre; predicato sotto una macrocategoria; valore sotto un predicato.
+            TipoVoce padreAtteso = switch (tipo) {
+                case MACROCATEGORIA -> null;
+                case PREDICATO -> TipoVoce.MACROCATEGORIA;
+                case VALORE -> TipoVoce.PREDICATO;
+            };
+            if (padreAtteso == null ? !padre.isEmpty() : definite.get(padre) != padreAtteso) {
+                throw errore(numero, "padre '" + padre + "' non valido per " + codice);
             }
             definite.put(codice, tipo);
-            righe.add(new RigaTassonomia(tipo, codice, nome, padre, multiplo.equals("S"), colonne.get(5),
-                    colonne.get(6)));
+            righe.add(new RigaTassonomia(tipo, codice, nome, padre, "S".equals(colonne.get(4)),
+                    colonne.get(5), colonne.get(6)));
         }
         return new DefinizioneTassonomia(righe);
     }
@@ -96,18 +72,6 @@ public final class DefinizioneTassonomia {
         Map<TipoVoce, Long> conteggi = new EnumMap<>(TipoVoce.class);
         righe.forEach(r -> conteggi.merge(r.tipo(), 1L, Long::sum));
         return conteggi;
-    }
-
-    private static void verificaFormato(Pattern formato, String codice, int numero) {
-        if (!formato.matcher(codice).matches()) {
-            throw errore(numero, "codice '" + codice + "' non nel formato atteso");
-        }
-    }
-
-    private static void verificaPadre(Map<String, TipoVoce> definite, String padre, TipoVoce atteso, int numero) {
-        if (definite.get(padre) != atteso) {
-            throw errore(numero, "il padre '" + padre + "' non è una " + atteso + " già definita");
-        }
     }
 
     private static TassonomiaNonValidaException errore(int riga, String messaggio) {

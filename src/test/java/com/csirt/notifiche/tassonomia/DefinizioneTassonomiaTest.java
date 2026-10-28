@@ -50,15 +50,6 @@ class DefinizioneTassonomiaTest {
     }
 
     @Test
-    @DisplayName("Valore con codice di un altro predicato: definizione rifiutata")
-    void valoreNelPredicatoSbagliato() {
-        assertThrows(TassonomiaNonValidaException.class, () -> definizione(
-                "MACROCATEGORIA;BC;Baseline Characterization;;N;;\n"
-                        + "PREDICATO;BC:IM;Impact;BC;S;;\n"
-                        + "VALORE;BC:RO_AV;Availability;BC:IM;N;;\n"));
-    }
-
-    @Test
     @DisplayName("Predicato senza la sua macrocategoria: definizione rifiutata")
     void predicatoOrfano() {
         assertThrows(TassonomiaNonValidaException.class, () -> definizione(

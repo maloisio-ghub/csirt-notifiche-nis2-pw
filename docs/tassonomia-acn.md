@@ -38,9 +38,9 @@ dell'applicazione. La procedura si articola in quattro fasi.
    CSV di riferimento e flag `attiva`.
 4. **Validazione e caricamento all'avvio.** All'avvio il componente `CaricamentoTassonomia` legge il
    manifest e, per ogni versione non ancora presente nel database, valida il CSV con
-   `DefinizioneTassonomia` prima di scrivere qualsiasi dato. I controlli sono: intestazione corretta,
-   codici univoci e nel formato atteso, ogni voce collegata a un padre del livello superiore già definito,
-   codice del figlio coerente con quello del padre (`BC` → `BC:IM` → `BC:IM_AV`). Se un controllo fallisce
+   `DefinizioneTassonomia` prima di scrivere qualsiasi dato. I controlli sono: intestazione e numero di
+   colonne corretti, tipo riconosciuto, codice e nome presenti, codici univoci, ogni voce collegata a un
+   padre del livello superiore già definito (`BC` → `BC:IM` → `BC:IM_AV`). Se un controllo fallisce
    l'applicazione non si avvia e l'errore indica il numero di riga: è preferibile fermarsi piuttosto che
    classificare incidenti con una tassonomia incompleta o incoerente.
 
@@ -107,8 +107,8 @@ tabella riporta la voce di origine, l'adattamento scelto e la motivazione.
 | --- | --- | --- | --- |
 | Struttura a tre livelli: macrocategoria → predicato → valore (cap. 3, introduzione) | La traccia parla di "categorie e sottocategorie", cioè di due livelli; la TC-ACN ne prevede tre | Categoria = predicato (21), sottocategoria = valore (219); la macrocategoria (4) è conservata come livello di raggruppamento superiore. I tre livelli stanno nella tabella `voce_tassonomia`, collegati dal riferimento al padre | Conservare la struttura ufficiale rende i conteggi direttamente confrontabili con il documento ed evita di perdere informazione utile alla classificazione |
 | 19 sotto-predicati del predicato Involved Asset (AC:IN, § 3.4.3), ad esempio "Hardware – OT" | Il documento li introduce "a causa della numerosità dei valori" per facilitarne la lettura, ma non assegna loro un codice | Registrati come attributo `gruppo` dei 98 valori di AC:IN, non come livello della gerarchia | Trattarli come livello aggiungerebbe 19 voci non previste e altererebbe i conteggi ufficiali; come attributo restano disponibili per raggruppare i valori nell'interfaccia |
-| Codici TT:VU_0- (0-Day Vulnerability) e TT:VU_N- (n-Day Vulnerability), § 3.2.9.1 e 3.2.9.2 | Terminano con un trattino, a differenza degli altri valori, il cui suffisso è formato da lettere | Caricati identici al documento; il formato validato ammette il trattino | Il codice è l'identificativo ufficiale della voce: normalizzarlo (ad esempio in TT:VU_0D) creerebbe codici inesistenti nella tassonomia e non riconducibili alla fonte |
-| Codici dei valori di Involved Asset, ad esempio AC:IN_HW-OT_PLC | Il suffisso contiene trattini e un secondo underscore, quindi ha una struttura più articolata degli altri codici | Caricati identici; il formato validato ammette lettere, cifre, `-` e `_` dopo il prefisso del predicato | Come per i codici precedenti, fedeltà all'identificativo ufficiale |
+| Codici TT:VU_0- (0-Day Vulnerability) e TT:VU_N- (n-Day Vulnerability), § 3.2.9.1 e 3.2.9.2 | Terminano con un trattino, a differenza degli altri valori, il cui suffisso è formato da lettere | Caricati identici al documento; senza modifiche al codice | Il codice è l'identificativo ufficiale della voce: normalizzarlo (ad esempio in TT:VU_0D) creerebbe codici inesistenti nella tassonomia e non riconducibili alla fonte |
+| Codici dei valori di Involved Asset, ad esempio AC:IN_HW-OT_PLC | Il suffisso contiene trattini e un secondo underscore, quindi ha una struttura più articolata degli altri codici | Caricati identici; senza modifiche al codice | Come per i codici precedenti, fedeltà all'identificativo ufficiale |
 | Cardinalità dei predicati | Il documento non indica se per un incidente un predicato ammetta uno o più valori | Scelta progettuale (colonna `selezione_multipla`): selezione singola per Severity (BC:SE) e Outlook (AC:OU), multipla per gli altri 19 predicati | Un incidente ha una sola gravità e una sola tendenza, mentre può avere più impatti, più asset coinvolti o più vettori. La scelta è dichiarata nello script di estrazione e modificabile nel CSV |
 | Lingua di nomi e descrizioni | I nomi delle voci sono in inglese, le descrizioni in italiano | Mantenuti come nel documento, senza traduzioni | Fedeltà alla fonte; i nomi inglesi coincidono con quelli usati negli scambi con il CSIRT |
 | Macrocategorie (§ 3.1, 3.2, 3.3, 3.4) | Nel capitolo 3 il titolo di ogni macrocategoria è seguito direttamente dal primo predicato, senza un testo descrittivo proprio | Descrizione lasciata vuota | Non si introducono contenuti assenti dalla fonte ufficiale |
