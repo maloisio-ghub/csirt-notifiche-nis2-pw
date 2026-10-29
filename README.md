@@ -97,6 +97,7 @@ completato sono in `docs/screenshot/`.
 - [Tassonomia ACN](docs/tassonomia-acn.md): fonte, caricamento, conteggi, discrepanze
 - [Matrice campo × adempimento](docs/matrice-campi.md): generata dal codice
 - [Traccia di riclassificazione](docs/traccia-riclassificazione.md): scenario con stato prima e dopo
+- [Registro delle decisioni](docs/decisioni.md): scelte progettuali e alternative scartate
 - Documento ufficiale della tassonomia: `docs/fonti/ACN_Tassonomia_Cyber_CLEAR.pdf`
 
 ## API principali
@@ -152,4 +153,4 @@ automaticamente. In un ambiente di produzione si userebbe un database persistent
 ## Uso di strumenti di intelligenza artificiale
 
 Nello sviluppo è stato usato un assistente basato su intelligenza artificiale come strumento di supporto:
-esempi di codice, diagnosi degli errori e contributo alla stesura dei testi descrittivi.
+esempi di codice, diagnosi degli errori e contributo correttivo alla stesura dei testi.
