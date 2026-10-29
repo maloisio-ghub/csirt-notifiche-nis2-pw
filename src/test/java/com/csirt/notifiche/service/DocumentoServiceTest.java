@@ -74,11 +74,23 @@ class DocumentoServiceTest {
     }
 
     @Test
-    @DisplayName("Nessun documento per un incidente non significativo")
-    void incidenteNonSignificativo() {
+    @DisplayName("Soglia: 30 minuti (appena sotto) non attiva il flusso di notifica")
+    void sottoSogliaNessunaNotifica() {
         Long id = incidente();
+        significativita.valuta(id, new RichiestaValutazione(null, null, null, null, null,
+                List.of(new ImpattoRichiesto("S1", 30, null, null, null, null))));
 
         assertThrows(OperazioneNonConsentitaException.class, () -> documenti.crea(id, TipoDocumento.PRE_NOTIFICA));
+    }
+
+    @Test
+    @DisplayName("Soglia: 31 minuti (appena sopra) attiva il flusso di notifica")
+    void sopraSogliaPreNotificaDisponibile() {
+        Long id = incidenteSignificativo();
+
+        DocumentoDto bozza = documenti.crea(id, TipoDocumento.PRE_NOTIFICA);
+
+        assertEquals(StatoDocumento.BOZZA, bozza.stato());
     }
 
     @Test
