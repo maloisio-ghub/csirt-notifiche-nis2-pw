@@ -1,8 +1,7 @@
 # Registro delle decisioni
 
 Le principali scelte progettuali del prototipo, con il contesto, le alternative considerate e scartate e le
-conseguenze. Alcune alternative sono state adottate in una prima versione e poi sostituite: in quei casi
-la voce indica anche il motivo del cambiamento.
+conseguenze.
 
 ## Riepilogo
 
@@ -32,7 +31,7 @@ HTML, CSS e JavaScript senza framework, serviti dalla stessa applicazione.
 - *Frontend separato con un framework SPA* (React o Angular): un secondo progetto con la sua build e il suo
   deploy, più la configurazione CORS, per un'interfaccia composta da poche schermate.
 
-**Conseguenze.** Un solo artefatto da compilare e pubblicare e una sola origine per interfaccia e API. La
+**Conseguenze.** Un solo scenario da compilare e pubblicare e una sola origine per interfaccia e API. La
 separazione tra le parti è affidata ai package e al verso delle dipendenze, sempre verso il basso.
 
 ## D2 – Database H2 in memoria
@@ -81,8 +80,7 @@ finale elenca i cambiamenti successivi alla notifica, confrontando ogni versione
 **Alternative scartate.**
 - *Modificare la classificazione esistente*: si perderebbe lo storico richiesto dalla traccia.
 - *Aggiornare anche i documenti già trasmessi*: renderebbe i documenti diversi da quanto inviato al CSIRT.
-- *Collegare ogni versione alla precedente con una chiave esterna* (adottato nella prima versione): un dato
-  ridondante, perché le versioni sono numerate in sequenza e la precedente della versione *n* è la *n − 1*.
+- *Collegare ogni versione alla precedente con una chiave esterna* un dato ridondante, perché le versioni sono numerate in sequenza e la precedente della versione *n* è la *n − 1*.
 
 **Conseguenze.** Lo stato prima e dopo la riclassificazione è sempre ricostruibile, come mostra la
 [traccia di esecuzione](traccia-riclassificazione.md).
@@ -100,7 +98,7 @@ quella generata dal codice.
 **Alternative scartate.**
 - *Regole ripetute nel JavaScript e nel generatore del PDF*: le copie avrebbero potuto divergere senza che
   nessun test se ne accorgesse.
-- *Annotazioni personalizzate sui campi dell'entità, lette con la reflection* (adottato nella prima versione):
+- *Annotazioni personalizzate sui campi dell'entità, lette con la reflection*
   più compatto, ma meno leggibile e più difficile da verificare; sostituito da una tabella esplicita.
 
 **Conseguenze.** Un nuovo campo richiede la colonna nell'entità, una riga nella tabella e la rigenerazione di
@@ -116,8 +114,8 @@ il motore delle regole R1–R10 le riceve come parametro.
 **Alternative scartate.**
 - *Costanti nel codice*: ogni variazione, ad esempio del fatturato, avrebbe richiesto una nuova versione
   dell'applicazione.
-- *Parametri versionati, con ogni valutazione collegata alla versione applicata* (adottato nella prima
-  versione): utile quando le soglie cambiano nel tempo, ma superfluo nel perimetro del prototipo, dove i
+- *Parametri versionati, con ogni valutazione collegata alla versione applicata* 
+  utile quando le soglie cambiano nel tempo, ma superfluo nel perimetro del prototipo, dove i
   parametri sono fissi.
 
 **Conseguenze.** Per aggiornare una soglia basta modificare il dato. Lo storico dei parametri resta un
@@ -132,8 +130,7 @@ tentativo viene rifiutato e l'API risponde 409.
 
 **Alternative scartate.**
 - *Impronta SHA-256 del contenuto calcolata alla trasmissione e controlli aggiuntivi con le callback JPA*
-  (adottato nella prima versione): senza un canale reale verso il CSIRT con cui confrontare l'impronta,
-  aggiungeva complessità senza un uso effettivo.
+  senza un canale reale verso il CSIRT con cui confrontare l'impronta aggiungeva complessità senza un uso effettivo.
 
 **Conseguenze.** L'immutabilità è verificata dai test; l'impronta potrà essere reintrodotta insieme
 all'integrazione con i canali ufficiali di notifica.
