@@ -21,7 +21,7 @@ tre servizi critici:
 | S3 | Backup-as-a-Service | 5.000 | 250 |
 
 I criteri di significatività (regole R1–R10) traducono gli artt. 3 e 10 del Regolamento di esecuzione (UE)
-2024/2690; la soglia di perdita economica è di 500.000 € (minore tra 500.000 € e il 5% del fatturato di 24 M€).
+2024/2690; la soglia di perdita economica è di 500.000 € (tra 500.000 € e il 5% del fatturato di 24 M€).
 Tabella delle regole, soglie e diagramma del flusso di valutazione: [docs/regole-significativita.md](docs/regole-significativita.md).
 
 ## Funzionalità
