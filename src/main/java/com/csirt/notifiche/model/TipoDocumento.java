@@ -1,6 +1,6 @@
 package com.csirt.notifiche.model;
 
-/** I tre adempimenti verso il CSIRT Italia (art. 23.4 Dir. UE 2022/2555, recepito dal D.Lgs. 138/2024). */
+/** I tre adempimenti verso il CSIRT Italia. */
 public enum TipoDocumento {
 
     PRE_NOTIFICA("Pre-notifica", "entro 24 ore dalla conoscenza dell'incidente significativo", "art. 23.4.a"),

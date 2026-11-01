@@ -7,8 +7,7 @@ import org.springframework.stereotype.Component;
 import com.csirt.notifiche.service.TassonomiaService;
 
 /**
- * All'avvio carica le versioni della tassonomia elencate nel manifest. Se un file è malformato
- * l'applicazione non parte
+ * All'avvio carica le versioni della tassonomia elencate nel manifest.
  */
 @Component
 public class CaricamentoTassonomia implements ApplicationRunner {

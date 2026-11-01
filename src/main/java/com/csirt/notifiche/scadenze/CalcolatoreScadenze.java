@@ -11,7 +11,7 @@ import java.util.Map;
 import com.csirt.notifiche.model.TipoDocumento;
 
 /**
- * Calcola i termini di notifica. Le ore sono tempo reale (Instant + Duration);
+ * Calcola i termini di notifica.
  * il mese è calendariale e si calcola nel fuso orario italiano.
  */
 public class CalcolatoreScadenze {

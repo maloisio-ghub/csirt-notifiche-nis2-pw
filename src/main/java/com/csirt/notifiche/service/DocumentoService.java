@@ -46,7 +46,7 @@ public class DocumentoService {
         this.clock = clock;
     }
 
-    /** Nuova bozza, precompilata con il contenuto del documento più recente dell'incidente. */
+
     @Transactional
     public DocumentoDto crea(Long incidenteId, TipoDocumento tipo) {
         Incidente incidente = incidenteService.trova(incidenteId);

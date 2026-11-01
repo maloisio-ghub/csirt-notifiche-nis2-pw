@@ -6,9 +6,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Lettore CSV minimale
- */
+
 public final class LettoreCsv {
 
     private LettoreCsv() {

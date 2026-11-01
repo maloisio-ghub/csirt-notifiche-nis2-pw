@@ -56,7 +56,7 @@ public class ContenutoNotifica {
     private String misureMitigazione;
 
     public ContenutoNotifica() {
-        // contenuto vuoto (richiesto anche da JPA)
+        // contenuto vuoto (richiesto da JPA)
     }
 
     public ContenutoNotifica(String referenteNome, String referenteEmail, String descrizioneSintetica,

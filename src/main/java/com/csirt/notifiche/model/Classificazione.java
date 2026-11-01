@@ -19,8 +19,7 @@ import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 
 /**
- * Classificazione TC-ACN di un incidente. Ogni cambiamento è una nuova versione numerata,
- * con momento e motivazione; le versioni precedenti restano consultabili.
+ * Classificazione TC-ACN di un incidente.
  */
 @Entity
 @Table(name = "classificazione", uniqueConstraints = @UniqueConstraint(
@@ -52,11 +51,11 @@ public class Classificazione {
     @Column(name = "data_classificazione", nullable = false)
     private Instant dataClassificazione;
 
-    /** Obbligatoria dalla versione 2 in poi: perché la classificazione è cambiata. */
+    /** Obbligatoria dalla versione 2 in poi perché la classificazione è cambiata. */
     @Column(name = "motivazione", length = 2000)
     private String motivazione;
 
-    /** Una sola classificazione attiva per incidente: l'ultima. */
+    /** Una sola classificazione attiva per incidente */
     @Column(name = "attiva", nullable = false)
     private boolean attiva;
 
@@ -97,7 +96,7 @@ public class Classificazione {
                 motivazione.trim());
     }
 
-    /** Codici ordinati, separati da virgola: forma stabile per i confronti. */
+
     public String codiciOrdinati() {
         return codici(valori);
     }

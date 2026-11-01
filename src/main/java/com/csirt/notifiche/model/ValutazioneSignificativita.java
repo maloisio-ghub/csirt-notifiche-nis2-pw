@@ -22,7 +22,7 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 
-/** Una valutazione di significatività: dati in ingresso ed esito. Non si modifica. */
+/** Una valutazione di significatività: dati in ingresso ed esito.*/
 @Entity
 @Table(name = "valutazione_significativita")
 public class ValutazioneSignificativita {

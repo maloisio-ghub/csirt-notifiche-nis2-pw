@@ -18,10 +18,7 @@ import jakarta.persistence.Table;
 
 import jakarta.persistence.UniqueConstraint;
 
-/**
- * Un adempimento verso il CSIRT. Ogni tipo può avere più versioni: una versione
- * trasmessa non si modifica, un aggiornamento è una versione nuova.
- */
+
 @Entity
 @Table(name = "documento", uniqueConstraints = @UniqueConstraint(
         name = "uk_documento_versione", columnNames = {"incidente_id", "tipo", "versione"}))
@@ -60,7 +57,7 @@ public class Documento {
 
 
 
-    /** Classificazione in vigore al momento della trasmissione: non cambia se l'incidente viene riclassificato. */
+    /** Classificazione in vigore al momento della trasmissione, non cambia se l'incidente viene riclassificato. */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "classificazione_id")
     private Classificazione classificazione;

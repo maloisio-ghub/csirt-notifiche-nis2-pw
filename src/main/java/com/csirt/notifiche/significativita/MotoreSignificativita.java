@@ -5,8 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Applica le regole R1-R10 (Reg. di esecuzione UE 2024/2690, artt. 3 e 10).
- * Tutte le soglie sono "più di": si usa il confronto stretto.
+ * Applica le regole R1-R10.
  */
 public class MotoreSignificativita {
 

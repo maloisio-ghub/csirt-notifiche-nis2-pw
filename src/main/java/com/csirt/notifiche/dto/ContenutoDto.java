@@ -7,8 +7,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Size;
 
 /**
- * Contenuto di un documento. In bozza ogni campo può essere vuoto: qui si controlla
- * solo il formato. I campi obbligatori per adempimento si verificano alla trasmissione.
+ * Contenuto di un documento.
  */
 public record ContenutoDto(
         @Size(max = 200) String referenteNome,

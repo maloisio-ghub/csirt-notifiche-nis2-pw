@@ -81,7 +81,7 @@ public class SignificativitaService {
                 .map(ValutazioneDto::da).toList();
     }
 
-    /** Arricchisce ogni impatto con la base utenti presa dal database. */
+    
     private List<ImpattoServizio> impatti(List<ImpattoRichiesto> richiesti) {
         if (richiesti == null) {
             return List.of();

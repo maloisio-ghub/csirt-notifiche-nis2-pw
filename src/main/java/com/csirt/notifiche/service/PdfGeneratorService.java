@@ -28,8 +28,7 @@ import com.lowagie.text.pdf.PdfPTable;
 import com.lowagie.text.pdf.PdfWriter;
 
 /**
- * Versione stampabile dei documenti di notifica. I campi e il loro ordine vengono dalla matrice
- * (RegoleDocumento): il PDF mostra solo i campi previsti per l'adempimento, con * sugli obbligatori.
+ * Versione stampabile dei documenti di notifica.
  */
 @Service
 public class PdfGeneratorService {

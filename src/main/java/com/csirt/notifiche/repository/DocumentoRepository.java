@@ -16,11 +16,11 @@ public interface DocumentoRepository extends JpaRepository<Documento, Long> {
     /** Il documento più recente dell'incidente, di qualunque tipo: la base per il riuso. */
     Optional<Documento> findTopByIncidenteIdOrderByIdDesc(Long incidenteId);
 
-    /** L'ultima versione di un certo tipo. */
+
     Optional<Documento> findTopByIncidenteIdAndTipoOrderByVersioneDesc(Long incidenteId, TipoDocumento tipo);
 
     boolean existsByIncidenteIdAndTipoAndStato(Long incidenteId, TipoDocumento tipo, StatoDocumento stato);
 
-    /** La prima versione trasmessa di un tipo: da lì si misura il rispetto dei termini. */
+
     Optional<Documento> findFirstByIncidenteIdAndTipoAndStatoOrderByVersioneAsc(Long incidenteId, TipoDocumento tipo, StatoDocumento stato);
 }

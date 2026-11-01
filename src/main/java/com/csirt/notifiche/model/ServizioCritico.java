@@ -24,7 +24,7 @@ public class ServizioCritico {
     @Column(name = "descrizione", length = 1000)
     private String descrizione;
 
-    /** Utenti del servizio: base per la soglia del 5% (art. 10 Reg. 2024/2690). */
+    /** Utenti del servizio: base per la soglia del 5%. */
     @Column(name = "base_utenti", nullable = false)
     private long baseUtenti;
 

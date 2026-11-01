@@ -31,7 +31,7 @@ public class Incidente {
 
     /**
      * Quando si è saputo che l'incidente è significativo.
-     * Da qui decorrono i termini di 24 h, 72 h e 1 mese (art. 23 NIS2).
+     * Da qui decorrono i termini di 24 h, 72 h e 1 mese.
      */
     @Column(name = "data_conoscenza")
     private Instant dataConoscenza;
