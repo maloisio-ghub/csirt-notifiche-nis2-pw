@@ -69,14 +69,10 @@ ORDER BY v.tipo
 Output per la versione `TC-ACN-2.0` (`GET /api/tassonomia/versioni/TC-ACN-2.0/conteggi`):
 
 ```json
-{"versione":"TC-ACN-2.0",
- "perTipo":[{"tipo":"MACROCATEGORIA","numero":4},
-            {"tipo":"PREDICATO","numero":21},
-            {"tipo":"VALORE","numero":219}],
- "perMacrocategoria":[{"macrocategoria":"BC","predicati":4,"valori":26},
-                      {"macrocategoria":"TT","predicati":9,"valori":62},
-                      {"macrocategoria":"TA","predicati":2,"valori":10},
-                      {"macrocategoria":"AC","predicati":6,"valori":121}]}
+  {"versione":"TC-ACN-2.0",
+   "perTipo":[{"tipo":"MACROCATEGORIA","numero":4},
+              {"tipo":"PREDICATO","numero":21},
+              {"tipo":"VALORE","numero":219}]}
 ```
 
 | Livello | Caricati nel database | Documento ACN |
@@ -85,17 +81,11 @@ Output per la versione `TC-ACN-2.0` (`GET /api/tassonomia/versioni/TC-ACN-2.0/co
 | Predicati (categorie) | 21 | 21 |
 | Valori (sottocategorie) | 219 | 219 |
 
-Dettaglio per macrocategoria (query `contaPerMacrocategoria`):
 
-| Macrocategoria | Predicati | Valori |
-| --- | --- | --- |
-| BC – Baseline Characterization | 4 | 26 |
-| TT – Threat Type | 9 | 62 |
-| TA – Threat Actor | 2 | 10 |
-| AC – Additional Context | 6 | 121 |
-| **Totale** | **21** | **219** |
 
-La corrispondenza è verificata automaticamente dal test `TassonomiaIntegrazioneTest`, che esegue le stesse
+
+
+La corrispondenza è verificata automaticamente dal test `TassonomiaIntegrazioneTest`, che esegue la stessa
 query sul database caricato all'avvio: se un caricamento futuro alterasse i numeri, la build fallirebbe.
 
 ## 4. Tabella delle discrepanze

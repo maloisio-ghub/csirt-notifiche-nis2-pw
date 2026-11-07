@@ -19,7 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.csirt.notifiche.dto.ConteggiDto;
-import com.csirt.notifiche.dto.ConteggioMacrocategoria;
+
 import com.csirt.notifiche.dto.ConteggioTipo;
 import com.csirt.notifiche.dto.TassonomiaDto;
 import com.csirt.notifiche.dto.VersioneDto;
@@ -93,11 +93,8 @@ public class TassonomiaService {
         List<ConteggioTipo> perTipo = voci.contaPerTipo(codiceVersione).stream()
                 .map(r -> new ConteggioTipo(r[0].toString(), ((Number) r[1]).longValue()))
                 .toList();
-        List<ConteggioMacrocategoria> perMacro = voci.contaPerMacrocategoria(codiceVersione).stream()
-                .map(r -> new ConteggioMacrocategoria(r[0].toString(), ((Number) r[1]).longValue(),
-                        ((Number) r[2]).longValue()))
-                .toList();
-        return new ConteggiDto(codiceVersione, perTipo, perMacro);
+
+        return new ConteggiDto(codiceVersione, perTipo);
     }
 
     private void salvaVoci(VersioneTassonomia versione, DefinizioneTassonomia definizione) {

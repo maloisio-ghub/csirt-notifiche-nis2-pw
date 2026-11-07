@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
-import com.csirt.notifiche.dto.ConteggioMacrocategoria;
+
 import com.csirt.notifiche.dto.ConteggioTipo;
 import com.csirt.notifiche.dto.TassonomiaDto;
 import com.csirt.notifiche.dto.VoceDto;
@@ -28,16 +28,6 @@ class TassonomiaIntegrazioneTest {
                 new ConteggioTipo("VALORE", 219)), tassonomia.conteggi("TC-ACN-2.0").perTipo());
     }
 
-    @Test
-    @DisplayName("Conteggio per macrocategoria")
-    void conteggiPerMacrocategoria() {
-        assertEquals(List.of(
-                new ConteggioMacrocategoria("BC", 4, 26),
-                new ConteggioMacrocategoria("TT", 9, 62),
-                new ConteggioMacrocategoria("TA", 2, 10),
-                new ConteggioMacrocategoria("AC", 6, 121)),
-                tassonomia.conteggi("TC-ACN-2.0").perMacrocategoria());
-    }
 
     @Test
     @DisplayName("Versione attiva con data di acquisizione e impronta; gerarchia dei codici rispettata")
