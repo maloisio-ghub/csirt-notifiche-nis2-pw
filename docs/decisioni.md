@@ -56,8 +56,7 @@ passa da JPA, quindi il passaggio a PostgreSQL richiede di cambiare driver e con
 non scritta nel codice.
 
 **Decisione.** Uno script Python estrae le voci dal PDF ufficiale in un CSV. Un manifest (`versioni.csv`)
-registra per ogni versione URL, date e impronta SHA-256 del PDF. All'avvio i file vengono validati e caricati
-nel database.
+registra per ogni versione URL, date e impronta SHA-256 del PDF. All'avvio i file vengono letti con la libreria Apache Commons CSV, validati e caricati.
 
 **Alternative scartate.**
 - *Enum Java con i valori della tassonomia*: ogni nuova versione avrebbe richiesto di modificare e ricompilare

@@ -1,58 +1,27 @@
 package com.csirt.notifiche.tassonomia;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
 
 public final class LettoreCsv {
+
+    private static final CSVFormat FORMATO = CSVFormat.DEFAULT.builder().setDelimiter(';').build();
 
     private LettoreCsv() {
     }
 
     public static List<List<String>> leggi(Reader sorgente) throws IOException {
-        BufferedReader in = new BufferedReader(sorgente);
         List<List<String>> righe = new ArrayList<>();
-        List<String> riga = new ArrayList<>();
-        StringBuilder campo = new StringBuilder();
-        boolean traVirgolette = false;
-        int c;
-        while ((c = in.read()) != -1) {
-            char ch = (char) c;
-            if (traVirgolette) {
-                if (ch == '"') {
-                    in.mark(1);
-                    int successivo = in.read();
-                    if (successivo == '"') {
-                        campo.append('"');
-                    } else {
-                        traVirgolette = false;
-                        if (successivo != -1) {
-                            in.reset();
-                        }
-                    }
-                } else {
-                    campo.append(ch);
-                }
-            } else if (ch == '"' && campo.length() == 0) {
-                traVirgolette = true;
-            } else if (ch == ';') {
-                riga.add(campo.toString());
-                campo.setLength(0);
-            } else if (ch == '\n') {
-                riga.add(campo.toString());
-                campo.setLength(0);
-                righe.add(riga);
-                riga = new ArrayList<>();
-            } else if (ch != '\r') {
-                campo.append(ch);
+        try (CSVParser parser = CSVParser.parse(sorgente, FORMATO)) {
+            for (CSVRecord riga : parser) {
+                righe.add(riga.toList());
             }
-        }
-        if (campo.length() > 0 || !riga.isEmpty()) {
-            riga.add(campo.toString());
-            righe.add(riga);
         }
         return righe;
     }
