@@ -70,9 +70,12 @@ class RegoleDocumentoTest {
     @Test
     @DisplayName("La matrice documentata in docs/matrice-campi.md coincide con quella generata dal codice")
     void matriceDocumentataUgualeAlCodice() throws IOException {
+        String generata = RegoleDocumento.matriceMarkdown();
+        Files.createDirectories(Path.of("target"));
+        Files.writeString(Path.of("target", "matrice-campi.md"), generata, StandardCharsets.UTF_8);
         String documentata = Files.readString(Path.of("docs", "matrice-campi.md"), StandardCharsets.UTF_8);
-        assertEquals(normalizza(RegoleDocumento.matriceMarkdown()), normalizza(documentata),
-                "docs/matrice-campi.md non è aggiornato: rigeneralo da /api/documenti/matrice.md");
+        assertEquals(normalizza(generata), normalizza(documentata),
+                "docs/matrice-campi.md non è aggiornato: copia target/matrice-campi.md in docs/");
     }
 
     private static String normalizza(String testo) {

@@ -113,7 +113,7 @@ completato sono in `docs/screenshot/`.
 | `PUT` | `/api/documenti/{id}` | Salvataggio in bozza |
 | `POST` | `/api/documenti/{id}/trasmissione` | Trasmissione (422 se incompleto) |
 | `GET` | `/api/documenti/{id}/pdf`, `/json` | Export |
-| `GET` | `/api/documenti/matrice`, `/matrice.md` | Matrice generata dal codice |
+| `GET` | `/api/documenti/matrice` | Matrice generata dal codice |
 | `GET` | `/api/incidenti/{id}/traccia` | Traccia di esecuzione |
 | `GET` | `/api/tassonomia`, `/api/tassonomia/versioni/{codice}/conteggi` | Tassonomia attiva, conteggi |
 | `GET` | `/api/servizi`, `/api/parametri` | Dati di riferimento |

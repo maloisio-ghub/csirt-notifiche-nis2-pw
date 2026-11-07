@@ -67,10 +67,7 @@ public class DocumentoController {
         return RegoleDocumento.matrice();
     }
 
-    @GetMapping(value = "/documenti/matrice.md", produces = "text/markdown;charset=UTF-8")
-    public String matriceMarkdown() {
-        return RegoleDocumento.matriceMarkdown();
-    }
+
 
     @GetMapping("/incidenti/{id}/traccia")
     public TracciaDto traccia(@PathVariable Long id) {
