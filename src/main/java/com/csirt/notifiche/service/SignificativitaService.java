@@ -1,6 +1,6 @@
 package com.csirt.notifiche.service;
 
-import java.time.Clock;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -32,16 +32,15 @@ public class SignificativitaService {
     private final ConfigurazioneService configurazione;
     private final ServizioCriticoRepository servizi;
     private final ValutazioneSignificativitaRepository valutazioni;
-    private final Clock clock;
+;
 
     public SignificativitaService(IncidenteService incidenteService, ConfigurazioneService configurazione,
-                                  ServizioCriticoRepository servizi, ValutazioneSignificativitaRepository valutazioni,
-                                  Clock clock) {
+                                  ServizioCriticoRepository servizi, ValutazioneSignificativitaRepository valutazioni) {
         this.incidenteService = incidenteService;
         this.configurazione = configurazione;
         this.servizi = servizi;
         this.valutazioni = valutazioni;
-        this.clock = clock;
+
     }
 
     @Transactional
@@ -57,7 +56,7 @@ public class SignificativitaService {
                 vero(richiesta.accessoMalevoloConGravePerturbazione()),
                 impatti(richiesta.impatti()));
         EsitoValutazione esito = motore.valuta(dati, parametri.comeSoglia());
-        Instant adesso = Instant.now(clock);
+        Instant adesso = Instant.now();
 
         try {
             if (esito.significativo()) {
@@ -81,7 +80,7 @@ public class SignificativitaService {
                 .map(ValutazioneDto::da).toList();
     }
 
-    
+
     private List<ImpattoServizio> impatti(List<ImpattoRichiesto> richiesti) {
         if (richiesti == null) {
             return List.of();

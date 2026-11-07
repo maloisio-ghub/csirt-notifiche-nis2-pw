@@ -75,7 +75,7 @@ repository. Le regole di dominio non conoscono né HTTP né il database.
 | Regole di dominio | `significativita`, `scadenze`, `documenti`, `tassonomia` | Regole R1–R10, calcolo dei termini, matrice dei campi, riclassificazioni successive alla notifica, validazione della tassonomia | Non accede al database |
 | Modello | `model` | Entità JPA e invarianti: transizioni di stato, immutabilità dei documenti trasmessi, versioni delle classificazioni | |
 | Persistenza | `repository` | Query derivate dal nome dei metodi; query SQL native di conteggio della tassonomia | |
-| Configurazione | `config` | Orologio di sistema (`Clock`) e caricamento della tassonomia all'avvio | |
+| Configurazione | `config` | Caricamento della tassonomia all'avvio | |
 
 ## Flusso principale
 

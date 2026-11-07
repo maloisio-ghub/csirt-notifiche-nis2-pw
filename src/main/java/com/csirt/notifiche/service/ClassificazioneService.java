@@ -1,6 +1,6 @@
 package com.csirt.notifiche.service;
 
-import java.time.Clock;
+
 import java.time.Instant;
 import java.util.HashSet;
 import java.util.List;
@@ -36,15 +36,15 @@ public class ClassificazioneService {
     private final VersioneTassonomiaRepository versioni;
     private final VoceTassonomiaRepository voci;
     private final IncidenteService incidenteService;
-    private final Clock clock;
+
 
     public ClassificazioneService(ClassificazioneRepository classificazioni, VersioneTassonomiaRepository versioni,
-                                  VoceTassonomiaRepository voci, IncidenteService incidenteService, Clock clock) {
+                                  VoceTassonomiaRepository voci, IncidenteService incidenteService) {
         this.classificazioni = classificazioni;
         this.versioni = versioni;
         this.voci = voci;
         this.incidenteService = incidenteService;
-        this.clock = clock;
+
     }
 
     @Transactional
@@ -58,7 +58,7 @@ public class ClassificazioneService {
                 .orElseThrow(() -> new IllegalStateException("Nessuna versione della tassonomia attiva"));
         Set<VoceTassonomia> valori = valoriValidati(tassonomia, richiesta.codici());
         // Microsecondi, come nel database: il momento entra nell'impronta della relazione finale.
-        Instant adesso = Instant.now(clock);
+        Instant adesso = Instant.now();
 
         Optional<Classificazione> attiva = classificazioni.findByIncidenteIdAndAttivaTrue(incidenteId);
         if (attiva.isEmpty()) {

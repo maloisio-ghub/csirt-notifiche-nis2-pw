@@ -5,7 +5,7 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
-import java.time.Clock;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.HashMap;
@@ -42,12 +42,12 @@ public class TassonomiaService {
 
     private final VersioneTassonomiaRepository versioni;
     private final VoceTassonomiaRepository voci;
-    private final Clock clock;
 
-    public TassonomiaService(VersioneTassonomiaRepository versioni, VoceTassonomiaRepository voci, Clock clock) {
+
+    public TassonomiaService(VersioneTassonomiaRepository versioni, VoceTassonomiaRepository voci) {
         this.versioni = versioni;
         this.voci = voci;
-        this.clock = clock;
+
     }
 
     /** Carica le versioni elencate nel manifest e non ancora presenti nel database. */
@@ -70,7 +70,7 @@ public class TassonomiaService {
                 versioni.findByAttivaTrue().ifPresent(VersioneTassonomia::disattiva);
             }
             VersioneTassonomia versione = versioni.save(new VersioneTassonomia(codice, r.get(1), r.get(2),
-                    LocalDate.parse(r.get(3)), LocalDate.parse(r.get(4)), r.get(5), r.get(7), Instant.now(clock),
+                    LocalDate.parse(r.get(3)), LocalDate.parse(r.get(4)), r.get(5), r.get(7), Instant.now(),
                     attiva));
             salvaVoci(versione, definizione);
             log.info("Tassonomia {} caricata da {}: {}", codice, r.get(7), definizione.conteggi());

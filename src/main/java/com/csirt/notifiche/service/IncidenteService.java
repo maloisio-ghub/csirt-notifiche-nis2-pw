@@ -1,6 +1,6 @@
 package com.csirt.notifiche.service;
 
-import java.time.Clock;
+
 import java.time.Instant;
 import java.util.EnumMap;
 import java.util.List;
@@ -24,19 +24,19 @@ public class IncidenteService {
 
     private final IncidenteRepository repository;
     private final DocumentoRepository documenti;
-    private final Clock clock;
+
     private final CalcolatoreScadenze calcolatore = new CalcolatoreScadenze();
 
-    public IncidenteService(IncidenteRepository repository, DocumentoRepository documenti, Clock clock) {
+    public IncidenteService(IncidenteRepository repository, DocumentoRepository documenti) {
         this.repository = repository;
         this.documenti = documenti;
-        this.clock = clock;
+
     }
 
     @Transactional
     public Incidente registra(NuovoIncidente dati) {
         Incidente incidente = new Incidente(dati.titolo().trim(), dati.descrizione(),
-                dati.dataRilevamento(), Instant.now(clock));
+                dati.dataRilevamento(), Instant.now());
         return repository.save(incidente);
     }
 
@@ -59,6 +59,6 @@ public class IncidenteService {
             documenti.findFirstByIncidenteIdAndTipoAndStatoOrderByVersioneAsc(id, tipo, StatoDocumento.TRASMESSO)
                     .ifPresent(d -> trasmissioni.put(tipo, d.getDataTrasmissione()));
         }
-        return calcolatore.calcolaConTrasmissioni(incidente.getDataConoscenza(), trasmissioni, Instant.now(clock));
+        return calcolatore.calcolaConTrasmissioni(incidente.getDataConoscenza(), trasmissioni, Instant.now());
     }
 }

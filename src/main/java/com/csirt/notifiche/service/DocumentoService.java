@@ -1,6 +1,6 @@
 package com.csirt.notifiche.service;
 
-import java.time.Clock;
+
 import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
@@ -35,15 +35,15 @@ public class DocumentoService {
     private final ClassificazioneRepository classificazioni;
     private final IncidenteService incidenteService;
     private final PdfGeneratorService pdf;
-    private final Clock clock;
+
 
     public DocumentoService(DocumentoRepository documenti, ClassificazioneRepository classificazioni,
-                            IncidenteService incidenteService, PdfGeneratorService pdf, Clock clock) {
+                            IncidenteService incidenteService, PdfGeneratorService pdf) {
         this.documenti = documenti;
         this.classificazioni = classificazioni;
         this.incidenteService = incidenteService;
         this.pdf = pdf;
-        this.clock = clock;
+
     }
 
 
@@ -66,7 +66,7 @@ public class DocumentoService {
                 .map(Documento::getContenuto)
                 .orElseGet(() -> contenutoIniziale(incidente));
 
-        Documento documento = documenti.save(new Documento(incidente, tipo, versione, contenuto, Instant.now(clock)));
+        Documento documento = documenti.save(new Documento(incidente, tipo, versione, contenuto, Instant.now()));
         return dto(documento);
     }
 
@@ -75,7 +75,7 @@ public class DocumentoService {
     public DocumentoDto aggiorna(Long documentoId, ContenutoDto dati) {
         Documento documento = trova(documentoId);
         try {
-            documento.aggiornaContenuto(dati.comeContenuto(), Instant.now(clock));
+            documento.aggiornaContenuto(dati.comeContenuto(), Instant.now());
         } catch (IllegalStateException e) {
             throw new OperazioneNonConsentitaException(e.getMessage());
         }
@@ -103,7 +103,7 @@ public class DocumentoService {
             throw new DocumentoIncompletoException(documento.getTipo(), mancanti);
         }
 
-        documento.trasmetti(Instant.now(clock), classificazione);
+        documento.trasmetti(Instant.now(), classificazione);
 
         if (documento.getTipo() == TipoDocumento.RELAZIONE_FINALE) {
             incidente.chiudi();
@@ -145,7 +145,7 @@ public class DocumentoService {
                 .map(Classificazione::getVersione).orElse(null);
         List<FotoDocumento> foto = documenti.findByIncidenteIdOrderByIdAsc(incidenteId).stream()
                 .map(d -> FotoDocumento.da(dto(d))).toList();
-        return new TracciaDto(incidenteId, incidente.getStato(), attiva, storico, foto, Instant.now(clock));
+        return new TracciaDto(incidenteId, incidente.getStato(), attiva, storico, foto, Instant.now());
     }
 
     private DocumentoDto dto(Documento documento) {
